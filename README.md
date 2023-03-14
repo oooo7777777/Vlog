@@ -1,6 +1,6 @@
 # 日志系统框架
 
-AwesomeLog 是一个基于mmap， 高性能，高可用的，无丢失的，简单易用的日志系统框架。
+VLog 是一个基于mmap， 高性能，高可用的，无丢失的，简单易用的日志系统框架。
 
 ## 特性介绍  
 
@@ -39,11 +39,17 @@ AwesomeLog 是一个基于mmap， 高性能，高可用的，无丢失的，简�
 ## 初始化
 ```
 //初始化日志系统
-ALog.init(new LogConfig(this));
+VLog.init(new LogConfig(this));
 ```
 
 ## 打印日志
 
 ```
-ALog.i("zyf", "hello AwesomeLog");
+VLog.i("zyf", "hello AwesomeLog");
+```
+
+## 立即写入到文件，在上传日志的时候调用
+
+```
+VLog.flush();
 ```
