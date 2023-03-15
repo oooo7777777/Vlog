@@ -2,7 +2,7 @@ package com.v.log.util
 
 import com.v.log.VLog
 
-const val TAG = "PRETTY_LOGGER"
+const val TAG = "V_LOG"
 
 enum class LEVEL {
     V, D, I, W, E, JSON, XML
