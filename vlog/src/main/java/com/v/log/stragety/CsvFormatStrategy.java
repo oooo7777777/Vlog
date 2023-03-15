@@ -46,10 +46,9 @@ public class CsvFormatStrategy implements DiskLogStrategy {
 //        builder.append(SEPARATOR);
         builder.append(Thread.currentThread().getName());
         builder.append(SEPARATOR);
-//        builder.append(LogUtils.logLevel(priority));
-//        builder.append(SEPARATOR);
-        builder.append(onceOnlyTag);
+        builder.append(LogUtils.logLevel(priority));
         builder.append(SEPARATOR);
+        builder.append(onceOnlyTag);
         Pair<String, String> classAndMethodName = LogUtils.getClassAndMethodName();
         if (classAndMethodName.first != null){
             builder.append(SEPARATOR);
@@ -60,9 +59,8 @@ public class CsvFormatStrategy implements DiskLogStrategy {
             builder.append(SEPARATOR);
             builder.append(classAndMethodName.second);
         }
-
+        builder.append(SEPARATOR);
         builder.append(csvFormatHandle(message));
-
         builder.append(NEW_LINE);
 
         logStrategy.log(priority, onceOnlyTag, builder.toString());
