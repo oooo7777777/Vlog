@@ -1,4 +1,4 @@
-package com.v.vlog
+package com.v.demo
 
 import android.Manifest
 import androidx.appcompat.app.AppCompatActivity
@@ -6,11 +6,9 @@ import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks
 import pub.devrel.easypermissions.EasyPermissions.RationaleCallbacks
 import android.os.Bundle
 import android.view.View
-import com.v.vlog.R
 import com.v.log.VLog
 import com.v.log.LogConfig
 import pub.devrel.easypermissions.EasyPermissions
-import com.v.vlog.MainActivity
 import android.widget.Toast
 import com.v.log.util.*
 

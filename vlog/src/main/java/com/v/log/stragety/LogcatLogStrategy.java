@@ -9,7 +9,7 @@ public class LogcatLogStrategy implements LogStrategy {
     @Override
     public void log(int priority, String tag, String message, Boolean save) {
         //打印日志
-        if (VLog.getShowLog()) {
+        if (VLog.isShowLog()) {
             Log.println(priority, tag, message);
         }
     }

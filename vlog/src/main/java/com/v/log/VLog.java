@@ -19,6 +19,7 @@ public final class VLog {
     private static DiskLogPrinter sDiskLogPrinter = null;
     private static AndroidLogPrinter sAndroidLogPrinter = null;
     private static boolean showLog;
+    private static boolean showSaveLog;
 
     private VLog() {
         //no instance
@@ -29,6 +30,7 @@ public final class VLog {
             throw new RuntimeException("LogConfig can't be null");
         }
         setShowLog(logConfig.getShowLog());
+        setShowSaveLog(logConfig.getShowSaveLog());
         ConfigCenter configCenter = ConfigCenter.getInstance();
         if (sDiskLogPrinter == null && sAndroidLogPrinter == null) {
             final Context applicationContext = logConfig.getContext().getApplicationContext();
@@ -57,12 +59,20 @@ public final class VLog {
         }
     }
 
-    public static void setShowLog(Boolean show) {
-        showLog = show;
+    public static boolean isShowLog() {
+        return showLog;
     }
 
-    public static boolean getShowLog() {
-        return showLog;
+    public static void setShowLog(boolean showLog) {
+        VLog.showLog = showLog;
+    }
+
+    public static boolean isShowSaveLog() {
+        return showSaveLog;
+    }
+
+    public static void setShowSaveLog(boolean showSaveLog) {
+        VLog.showSaveLog = showSaveLog;
     }
 
     public static void setLogger(Logger logger) {

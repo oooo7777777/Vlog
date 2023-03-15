@@ -3,7 +3,10 @@ package com.v.log.stragety;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
+
+import com.v.log.VLog;
 import com.v.log.util.LogUtils;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -51,12 +54,12 @@ public class CsvFormatStrategy implements DiskLogStrategy {
         builder.append(SEPARATOR);
         builder.append(onceOnlyTag);
         Pair<String, String> classAndMethodName = LogUtils.getClassAndMethodName();
-        if (classAndMethodName.first != null){
+        if (classAndMethodName.first != null) {
             builder.append(SEPARATOR);
             builder.append(classAndMethodName.first);
 
         }
-        if (classAndMethodName.second != null){
+        if (classAndMethodName.second != null) {
             builder.append(SEPARATOR);
             builder.append(classAndMethodName.second);
         }
@@ -64,8 +67,10 @@ public class CsvFormatStrategy implements DiskLogStrategy {
         builder.append(csvFormatHandle(message));
         builder.append(NEW_LINE);
 
-        Log.i("PRETTY_LOGGER",builder.toString());
-        logStrategy.log(priority, onceOnlyTag, builder.toString(),save);
+        if (VLog.isShowSaveLog()) {
+            Log.i("PRETTY_LOGGER", builder.toString());
+        }
+        logStrategy.log(priority, onceOnlyTag, builder.toString(), save);
     }
 
     @Override
@@ -75,17 +80,18 @@ public class CsvFormatStrategy implements DiskLogStrategy {
 
     /**
      * csv格式如果有逗号或者换行的话整体用双引号括起来；如果里面还有双引号就替换成两个双引号，
+     *
      * @param message
      * @return
      */
-    private String csvFormatHandle(String message){
+    private String csvFormatHandle(String message) {
         if (TextUtils.isEmpty(message)) return message;
         String messageCSV = message;
         Matcher matcher = Pattern.compile("[\r\n\t]").matcher(messageCSV);
         // 如果包含逗号或者换行的话就在前后添加双引号
-        if(message.contains(",") || matcher.find()){
+        if (message.contains(",") || matcher.find()) {
             // 先将双引号转义，避免两边加了双引号后转义错误
-            if(message.contains("\"")){
+            if (message.contains("\"")) {
                 messageCSV = message.replace("\"", "\"\"");
             }
             messageCSV = "\"" + messageCSV + "\"";
@@ -101,10 +107,12 @@ public class CsvFormatStrategy implements DiskLogStrategy {
     public static final class Builder {
         SimpleDateFormat dateFormat;
         DiskLogStrategy logStrategy;
+
         private Builder() {
             dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.CHINA);
             logStrategy = new DiskDailyLogStrategy.Builder().build();
         }
+
         public Builder dateFormat(SimpleDateFormat val) {
             dateFormat = val;
             return this;

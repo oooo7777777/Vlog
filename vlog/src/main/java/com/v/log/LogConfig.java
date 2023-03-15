@@ -42,6 +42,11 @@ public class LogConfig {
      */
     private Boolean showLog = true;
 
+    /**
+     * 是否打印保存日志
+     */
+    private Boolean showSaveLog = false;
+
 
     public LogConfig(Context context) {
         mContext = context;
@@ -107,5 +112,13 @@ public class LogConfig {
 
     public void setShowLog(Boolean mShowLog) {
         this.showLog = mShowLog;
+    }
+
+    public Boolean getShowSaveLog() {
+        return showSaveLog;
+    }
+
+    public void setShowSaveLog(Boolean showSaveLog) {
+        this.showSaveLog = showSaveLog;
     }
 }

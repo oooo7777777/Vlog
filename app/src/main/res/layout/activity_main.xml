@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    tools:context="com.v.vlog.MainActivity">
+    tools:context="com.v.demo.MainActivity">
 
     <Button
         android:onClick="write2file"
