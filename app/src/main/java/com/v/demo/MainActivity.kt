@@ -26,24 +26,9 @@ class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallback
         )
     }
 
-    fun write2file(view: View?) {
+    fun writeFile(view: View?) {
         if (hasWriteAndReadPermissions()) {
-            val sb = StringBuffer()
-            for (i in 0..9) {
-                sb.append("测试11111111111111111111111111:$i")
-            }
-            sb.logI()
-            Toast.makeText(this@MainActivity, "success", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    fun writeSave(view: View?) {
-        if (hasWriteAndReadPermissions()) {
-            val sb = StringBuffer()
-            for (i in 0..9) {
-                sb.append("测试22222222222222222222222$i")
-            }
-            sb.logI(save = false)
+            "hello VLog".logI()
             Toast.makeText(this@MainActivity, "success", Toast.LENGTH_LONG).show()
         }
     }

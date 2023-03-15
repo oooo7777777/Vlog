@@ -32,7 +32,7 @@ VLog 是一个基于mmap， 高性能，高可用的，无丢失的，简单易�
 
    ```groovy
    dependencies {
-   	        implementation 'com.github.oooo7777777:Vlog:1.0.0'
+   	        implementation 'com.github.oooo7777777:Vlog:1.0.4'
    	}
    ```
 
@@ -42,10 +42,14 @@ VLog 是一个基于mmap， 高性能，高可用的，无丢失的，简单易�
 VLog.init(new LogConfig(this));
 ```
 
-## 打印日志
+## 打印日志(推荐使用kotlin方法)
 
 ```
-VLog.i("zyf", "hello AwesomeLog");
+kotlin
+"hello VLog".logI()
+
+java
+LogExtKt.logI("hello VLog","PRETTY_LOGGER",true);
 ```
 
 ## 立即写入到文件，在上传日志的时候调用

@@ -79,6 +79,13 @@ fun logCurrentThreadName(tag: String = TAG, save: Boolean = true) = run {
 }
 
 
+/**
+ * 打印日志
+ * @param level 日志级别
+ * @param tag 日志tag
+ * @param message 日志内容
+ * @param save 是否需要同步保存到日志文件(请不要保存过长文件)
+ */
 private fun log(level: LEVEL, tag: String, message: String, save: Boolean = true) {
     //tag最长为70 不然会打印不出来
     var tagFormat = tag
