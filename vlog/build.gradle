@@ -1,22 +1,10 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
-    id 'org.jetbrains.kotlin.android'
-    id 'maven-publish'
+    id 'com.github.dcendents.android-maven'
 }
+group='com.github.oooo7777777'
 
-afterEvaluate {
-    publishing {
-        publications {
-            release(MavenPublication) {
-                from components.release
-                groupId = 'com.v.log'
-                artifactId = 'vlog'
-                version = '1.0.0'
-            }
-        }
-    }
-}
 
 android {
     compileSdkVersion 30
