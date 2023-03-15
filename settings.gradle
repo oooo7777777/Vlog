@@ -1,2 +1,2 @@
-include ':app', ':Vlog'
+include ':app', ':library'
 rootProject.name='Vlog'
