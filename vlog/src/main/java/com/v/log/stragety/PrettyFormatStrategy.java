@@ -23,7 +23,7 @@ public class PrettyFormatStrategy implements LogStrategy {
     }
 
     @Override
-    public void log(int priority, String onceOnlyTag, String message) {
+    public void log(int priority, String onceOnlyTag, String message, Boolean save) {
 
         logTopBorder(priority, onceOnlyTag);
 
@@ -63,7 +63,7 @@ public class PrettyFormatStrategy implements LogStrategy {
     }
 
     private void logChunk(int priority, String tag, String chunk) {
-        logStrategy.log(priority, tag, chunk);
+        logStrategy.log(priority, tag, chunk, false);
     }
 
 

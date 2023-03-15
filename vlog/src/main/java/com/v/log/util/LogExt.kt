@@ -1,0 +1,100 @@
+package com.v.log.util
+
+import com.v.log.VLog
+
+const val TAG = "PRETTY_LOGGER"
+
+enum class LEVEL {
+    V, D, I, W, E, JSON, XML
+}
+
+fun Any.logV(tag: String = TAG, save: Boolean = true) =
+    log(
+        LEVEL.V,
+        tag,
+        this.toString(),
+        save
+    )
+
+fun Any.logD(tag: String = TAG, save: Boolean = true) =
+    log(
+        LEVEL.D,
+        tag,
+        this.toString(),
+        save
+    )
+
+fun Any.logI(tag: String = TAG, save: Boolean = true) =
+    log(
+        LEVEL.I,
+        tag,
+        this.toString(),
+        save
+    )
+
+fun Any.logW(tag: String = TAG, save: Boolean = true) =
+    log(
+        LEVEL.W,
+        tag,
+        this.toString(),
+        save
+    )
+
+fun Any.logE(tag: String = TAG, save: Boolean = true) =
+    log(
+        LEVEL.E,
+        tag,
+        this.toString(),
+        save
+    )
+
+
+fun Any.logJson(tag: String = TAG, save: Boolean = true) =
+    log(
+        LEVEL.JSON,
+        tag,
+        this.toString(),
+        save
+    )
+
+fun Any.logXml(tag: String = TAG, save: Boolean = true) =
+    log(
+        LEVEL.XML,
+        tag,
+        this.toString(),
+        save
+    )
+
+
+fun Any.log(tag: String = TAG, level: LEVEL = LEVEL.I, save: Boolean = true) = run {
+    log(level, tag, this.toString(), save)
+}
+
+/**
+ * 当前当前线程
+ */
+fun logCurrentThreadName(tag: String = TAG, save: Boolean = true) = run {
+    log(LEVEL.I, tag, Thread.currentThread().name, save)
+
+}
+
+
+private fun log(level: LEVEL, tag: String, message: String, save: Boolean = true) {
+    //tag最长为70 不然会打印不出来
+    var tagFormat = tag
+    if (tag.length > 70) {
+        tagFormat = tag.substring(0, 70)
+    }
+
+    when (level) {
+        LEVEL.V -> VLog.v(tagFormat, save, message)
+        LEVEL.D -> VLog.d(tagFormat, save, message)
+        LEVEL.I -> VLog.i(tagFormat, save, message)
+        LEVEL.W -> VLog.w(tagFormat, save, message)
+        LEVEL.E -> VLog.e(tagFormat, save, message)
+        LEVEL.JSON -> VLog.json(tagFormat, save, message)
+        LEVEL.XML -> VLog.xml(tagFormat, save, message)
+
+    }
+
+}

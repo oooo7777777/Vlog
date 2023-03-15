@@ -1,7 +1,6 @@
 package com.v.log.logger;
 
 
-
 import com.v.log.Printer.Printer;
 
 import java.util.List;
@@ -13,32 +12,24 @@ public interface Logger {
     public static final int INFO = 4;
     public static final int WARN = 5;
     public static final int ERROR = 6;
-    public static final int ASSERT = 7;
-    public static final int NET = 8;
 
-    void d(String tag, String message, Object... args);
+    void d(String tag, Boolean save, String message, Object... args);
 
-    void d(String tag, Object object);
+    void e(String tag, Boolean save, String message, Object... args);
 
-    void e(String tag, String message, Object... args);
+    void e(String tag, Boolean save, Throwable throwable, String message, Object... args);
 
-    void e(String tag, Throwable throwable, String message, Object... args);
+    void w(String tag, Boolean save, String message, Object... args);
 
-    void w(String tag, String message, Object... args);
+    void i(String tag, Boolean save, String message, Object... args);
 
-    void i(String tag, String message, Object... args);
+    void v(String tag, Boolean save, String message, Object... args);
 
-    void v(String tag, String message, Object... args);
+    void json(String tag, Boolean save, String json);
 
-    void wtf(String tag, String message, Object... args);
+    void xml(String tag, Boolean save, String xml);
 
-    void json(String tag, String json);
-
-    void xml(String tag, String xml);
-
-    void net(String tag, String message, Object... args);
-
-    void log(int priority, String tag, String message, Throwable throwable);
+    void log(int priority, String tag, Boolean save, String message, Throwable throwable);
 
     void flush();
 

@@ -10,7 +10,6 @@ import com.v.log.config.ConfigCenter;
 import com.v.log.logger.ALogger;
 import com.v.log.logger.Logger;
 import com.v.log.util.NetworkManager;
-import com.orhanobut.logger.AndroidLogAdapter;
 
 import me.weishu.reflection.Reflection;
 
@@ -19,7 +18,7 @@ public final class VLog {
     private static Logger sLogger = new ALogger();
     private static DiskLogPrinter sDiskLogPrinter = null;
     private static AndroidLogPrinter sAndroidLogPrinter = null;
-
+    private static boolean showLog;
 
     private VLog() {
         //no instance
@@ -29,8 +28,7 @@ public final class VLog {
         if (null == logConfig) {
             throw new RuntimeException("LogConfig can't be null");
         }
-
-        com.orhanobut.logger.Logger.addLogAdapter(new AndroidLogAdapter());
+        setShowLog(logConfig.getShowLog());
         ConfigCenter configCenter = ConfigCenter.getInstance();
         if (sDiskLogPrinter == null && sAndroidLogPrinter == null) {
             final Context applicationContext = logConfig.getContext().getApplicationContext();
@@ -49,14 +47,22 @@ public final class VLog {
         }
         configCenter.setMaxKeepDaily(logConfig.getMaxKeepDaily());
         configCenter.setMaxLogSizeMb(logConfig.getMaxLogSizeMb());
-        configCenter.setmLogPath(logConfig.getmLogPath());
-        configCenter.setmCachePath(logConfig.getmCachePath());
+        configCenter.setmLogPath(logConfig.getLogPath());
+        configCenter.setmCachePath(logConfig.getCachePath());
 
         try {
             Reflection.unseal(logConfig.getContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static void setShowLog(Boolean show) {
+        showLog = show;
+    }
+
+    public static boolean getShowLog() {
+        return showLog;
     }
 
     public static void setLogger(Logger logger) {
@@ -85,53 +91,44 @@ public final class VLog {
     }
 
 
-    public static void log(int priority, String tag, String message, Throwable throwable) {
-        sLogger.log(priority, tag, message, throwable);
+    public static void log(int priority, String tag, Boolean save, String message, Throwable throwable) {
+        sLogger.log(priority, tag, save, message, throwable);
     }
 
-    public static void d(String tag, String message, Object... args) {
-        sLogger.d(message, args);
+    public static void d(String tag, Boolean save, String message, Object... args) {
+        sLogger.d(tag, save, message, args);
     }
 
-    public static void d(String tag, Object object) {
-        sLogger.d(tag, object);
+
+    public static void e(String tag, Boolean save, String message, Object... args) {
+        sLogger.e(tag, save, message, args);
     }
 
-    public static void e(String tag, String message, Object... args) {
-        sLogger.e(tag, message, args);
+    public static void e(String tag, Boolean save, Throwable throwable, String message, Object... args) {
+        sLogger.e(tag, save, throwable, message, args);
     }
 
-    public static void e(String tag, Throwable throwable, String message, Object... args) {
-        sLogger.e(tag, throwable, message, args);
+    public static void i(String tag, Boolean save, String message, Object... args) {
+        sLogger.i(tag, save, message, args);
     }
 
-    public static void i(String tag, String message, Object... args) {
-        sLogger.i(tag, message, args);
+    public static void v(String tag, Boolean save, String message, Object... args) {
+        sLogger.v(tag, save, message, args);
     }
 
-    public static void v(String tag, String message, Object... args) {
-        sLogger.v(tag, message, args);
+    public static void w(String tag, Boolean save, String message, Object... args) {
+        sLogger.w(tag, save, message, args);
     }
 
-    public static void w(String tag, String message, Object... args) {
-        sLogger.w(tag, message, args);
+
+    public static void json(String tag, Boolean save, String json) {
+        sLogger.json(tag, save, json);
     }
 
-    public static void wtf(String tag, String message, Object... args) {
-        sLogger.wtf(tag, message, args);
+    public static void xml(String tag, Boolean save, String xml) {
+        sLogger.xml(tag, save, xml);
     }
 
-    public static void json(String tag, String json) {
-        sLogger.json(tag, json);
-    }
-
-    public static void xml(String tag, String xml) {
-        sLogger.xml(tag, xml);
-    }
-
-    public static void net(String tag, String message, Object... args) {
-        sLogger.net(tag, message, args);
-    }
 
     /**
      * 立即写入到文件，在上传日志的时候调用

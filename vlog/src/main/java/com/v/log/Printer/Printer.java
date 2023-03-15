@@ -4,7 +4,7 @@ public interface Printer {
 
   boolean isLoggable(int priority, String tag);
 
-  void log(int priority, String tag, String message);
+  void log(int priority, String tag, String message, Boolean save);
 
   void flush();
 }

@@ -16,6 +16,14 @@
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <Button
+        android:onClick="writeSave"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="save"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+
+    <Button
         android:onClick="flush"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

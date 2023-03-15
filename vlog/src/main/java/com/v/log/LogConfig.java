@@ -30,17 +30,26 @@ public class LogConfig {
     /**
      * 日志保存路径
      */
-    private String mLogPath;
+    private String logPath;
 
     /**
      * 日志缓存路径
      */
-    private String mCachePath;
+    private String cachePath;
 
+    /**
+     * 是否打印日志
+     */
+    private Boolean showLog = true;
 
 
     public LogConfig(Context context) {
         mContext = context;
+    }
+
+    public LogConfig(Context context, Boolean showLog) {
+        mContext = context;
+        this.showLog = showLog;
     }
 
     public LogConfig setLogEncrypt(LogEncrypt logEncrypt) {
@@ -58,21 +67,21 @@ public class LogConfig {
         return this;
     }
 
-    public String getmLogPath() {
-        return mLogPath;
+    public String getLogPath() {
+        return logPath;
     }
 
-    public LogConfig setmLogPath(String mLogPath) {
-        this.mLogPath = mLogPath;
+    public LogConfig setLogPath(String mLogPath) {
+        this.logPath = mLogPath;
         return this;
     }
 
-    public String getmCachePath() {
-        return mCachePath;
+    public String getCachePath() {
+        return cachePath;
     }
 
-    public LogConfig setmCachePath(String mCachePath) {
-        this.mCachePath = mCachePath;
+    public LogConfig setCachePath(String mCachePath) {
+        this.cachePath = mCachePath;
         return this;
     }
 
@@ -90,5 +99,13 @@ public class LogConfig {
 
     public int getMaxKeepDaily() {
         return maxKeepDaily;
+    }
+
+    public Boolean getShowLog() {
+        return showLog;
+    }
+
+    public void setShowLog(Boolean mShowLog) {
+        this.showLog = mShowLog;
     }
 }

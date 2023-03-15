@@ -1,6 +1,7 @@
 package com.v.log.stragety;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.util.Pair;
 import com.v.log.util.LogUtils;
 import java.text.SimpleDateFormat;
@@ -34,7 +35,7 @@ public class CsvFormatStrategy implements DiskLogStrategy {
     }
 
     @Override
-    public void log(int priority, String onceOnlyTag, String message) {
+    public void log(int priority, String onceOnlyTag, String message, Boolean save) {
 
         date.setTime(System.currentTimeMillis());
 
@@ -63,7 +64,8 @@ public class CsvFormatStrategy implements DiskLogStrategy {
         builder.append(csvFormatHandle(message));
         builder.append(NEW_LINE);
 
-        logStrategy.log(priority, onceOnlyTag, builder.toString());
+        Log.i("PRETTY_LOGGER",builder.toString());
+        logStrategy.log(priority, onceOnlyTag, builder.toString(),save);
     }
 
     @Override

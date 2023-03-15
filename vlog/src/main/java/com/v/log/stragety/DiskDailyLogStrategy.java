@@ -2,6 +2,7 @@ package com.v.log.stragety;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import com.v.log.config.ConfigCenter;
 import com.v.log.encrypt.LogEncrypt;
@@ -25,7 +26,7 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
 
     private void initNativeLogger() {
         LightLog.newInstance().init(ConfigCenter.getInstance().getmCachePath(),
-                                    ConfigCenter.getInstance().getLogPath(),
+                ConfigCenter.getInstance().getLogPath(),
                 ConfigCenter.getInstance().getMaxLogSizeMb(),
                 ConfigCenter.getInstance().getMaxKeepDaily());
     }
@@ -57,13 +58,15 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
     }
 
     @Override
-    public void log(int level, String tag, final String message) {
-        ALogThreadPool.getFixedThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                writeLog(message);
-            }
-        });
+    public void log(int level, String tag, final String message, Boolean save) {
+        if (save) {
+            ALogThreadPool.getFixedThreadPool().execute(new Runnable() {
+                @Override
+                public void run() {
+                    writeLog(message);
+                }
+            });
+        }
     }
 
     @Override

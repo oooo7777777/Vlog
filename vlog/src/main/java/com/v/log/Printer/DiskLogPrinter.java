@@ -44,8 +44,8 @@ public class DiskLogPrinter implements DiskLogStrategy, Printer {
     }
 
     @Override
-    public void log(int priority, String tag, String message) {
-        formatStrategy.log(priority, tag, message);
+    public void log(int priority, String tag, String message, Boolean save) {
+        formatStrategy.log(priority, tag, message,save);
     }
 
     @Override

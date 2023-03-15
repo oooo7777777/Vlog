@@ -2,20 +2,21 @@ package com.v.log.stragety;
 
 import android.util.Log;
 
-import com.orhanobut.logger.Logger;
+import com.v.log.VLog;
 
 public class LogcatLogStrategy implements LogStrategy {
 
-  @Override
-  public void log(int priority, String tag, String message) {
-    //不打印日志
-    Log.println(priority, tag, message);
-//    Logger.i(message);
-  }
+    @Override
+    public void log(int priority, String tag, String message, Boolean save) {
+        //打印日志
+        if (VLog.getShowLog()) {
+            Log.println(priority, tag, message);
+        }
+    }
 
-  @Override
-  public void flush() {
+    @Override
+    public void flush() {
 
-  }
+    }
 
 }
