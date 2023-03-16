@@ -59,7 +59,7 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
 
     @Override
     public void log(int level, String tag, final String message, Boolean save) {
-        if (save) {
+        if (ConfigCenter.getInstance().getSaveLog() || save) {
             ALogThreadPool.getFixedThreadPool().execute(new Runnable() {
                 @Override
                 public void run() {

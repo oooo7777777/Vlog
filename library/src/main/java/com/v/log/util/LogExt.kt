@@ -65,17 +65,24 @@ fun Any.logXml(tag: String = TAG, save: Boolean = true) =
         save
     )
 
+//这两个方法为了java代码方便调用
+fun Any.log() = run {
+    this.log(TAG, LEVEL.I, true)
+}
+//这两个方法为了java代码方便调用
+fun Any.log(tag: String = TAG) = run {
+    this.log(tag, LEVEL.I, true)
+}
 
 fun Any.log(tag: String = TAG, level: LEVEL = LEVEL.I, save: Boolean = true) = run {
     log(level, tag, this.toString(), save)
 }
 
 /**
- * 当前当前线程
+ * 当前线程
  */
 fun logCurrentThreadName(tag: String = TAG, save: Boolean = true) = run {
     log(LEVEL.I, tag, Thread.currentThread().name, save)
-
 }
 
 
@@ -101,7 +108,5 @@ private fun log(level: LEVEL, tag: String, message: String, save: Boolean = true
         LEVEL.E -> VLog.e(tagFormat, save, message)
         LEVEL.JSON -> VLog.json(tagFormat, save, message)
         LEVEL.XML -> VLog.xml(tagFormat, save, message)
-
     }
-
 }

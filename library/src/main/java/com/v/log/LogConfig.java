@@ -47,6 +47,11 @@ public class LogConfig {
      */
     private Boolean showSaveLog = false;
 
+    /**
+     * 是否保存所有日志
+     */
+    private Boolean saveLog = true;
+
 
     public LogConfig(Context context) {
         mContext = context;
@@ -120,5 +125,13 @@ public class LogConfig {
 
     public void setShowSaveLog(Boolean showSaveLog) {
         this.showSaveLog = showSaveLog;
+    }
+
+    public Boolean getSaveLog() {
+        return saveLog;
+    }
+
+    public void setSaveLog(Boolean saveLog) {
+        this.saveLog = saveLog;
     }
 }

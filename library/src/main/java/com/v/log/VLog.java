@@ -18,8 +18,7 @@ public final class VLog {
     private static Logger sLogger = new ALogger();
     private static DiskLogPrinter sDiskLogPrinter = null;
     private static AndroidLogPrinter sAndroidLogPrinter = null;
-    private static boolean showLog;
-    private static boolean showSaveLog;
+
 
     private VLog() {
         //no instance
@@ -29,8 +28,6 @@ public final class VLog {
         if (null == logConfig) {
             throw new RuntimeException("LogConfig can't be null");
         }
-        setShowLog(logConfig.getShowLog());
-        setShowSaveLog(logConfig.getShowSaveLog());
         ConfigCenter configCenter = ConfigCenter.getInstance();
         if (sDiskLogPrinter == null && sAndroidLogPrinter == null) {
             final Context applicationContext = logConfig.getContext().getApplicationContext();
@@ -51,28 +48,15 @@ public final class VLog {
         configCenter.setMaxLogSizeMb(logConfig.getMaxLogSizeMb());
         configCenter.setmLogPath(logConfig.getLogPath());
         configCenter.setmCachePath(logConfig.getCachePath());
+        configCenter.setSaveLog(logConfig.getSaveLog());
+        configCenter.setShowLog(logConfig.getShowLog());
+        configCenter.setShowSaveLog(logConfig.getShowSaveLog());
 
         try {
             Reflection.unseal(logConfig.getContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public static boolean isShowLog() {
-        return showLog;
-    }
-
-    public static void setShowLog(boolean showLog) {
-        VLog.showLog = showLog;
-    }
-
-    public static boolean isShowSaveLog() {
-        return showSaveLog;
-    }
-
-    public static void setShowSaveLog(boolean showSaveLog) {
-        VLog.showSaveLog = showSaveLog;
     }
 
     public static void setLogger(Logger logger) {

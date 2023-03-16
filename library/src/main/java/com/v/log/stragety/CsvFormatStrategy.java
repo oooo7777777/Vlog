@@ -5,6 +5,8 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.v.log.VLog;
+import com.v.log.config.ConfigCenter;
+import com.v.log.util.LogExtKt;
 import com.v.log.util.LogUtils;
 
 import java.text.SimpleDateFormat;
@@ -67,9 +69,10 @@ public class CsvFormatStrategy implements DiskLogStrategy {
         builder.append(csvFormatHandle(message));
         builder.append(NEW_LINE);
 
-        if (VLog.isShowSaveLog()) {
-            Log.i("PRETTY_LOGGER", builder.toString());
+        if (ConfigCenter.getInstance().getShowSaveLog()) {
+            Log.i(LogExtKt.TAG, builder.toString());
         }
+
         logStrategy.log(priority, onceOnlyTag, builder.toString(), save);
     }
 
