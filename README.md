@@ -49,7 +49,7 @@ kotlin
 "hello VLog".logI()
 
 java
-LogExtKt.logI("hello VLog","PRETTY_LOGGER",true);
+LogExtKt.log("hello VLog");
 ```
 
 ## 立即写入到文件，在上传日志的时候调用
