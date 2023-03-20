@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallback
     fun writeFile(view: View?) {
         if (hasWriteAndReadPermissions()) {
             "hello VLog".logI()
+            "hello VLog".log()
             Toast.makeText(this@MainActivity, "success", Toast.LENGTH_LONG).show()
         }
     }

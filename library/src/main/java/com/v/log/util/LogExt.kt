@@ -8,81 +8,112 @@ enum class LEVEL {
     V, D, I, W, E, JSON, XML
 }
 
-fun Any.logV(tag: String = TAG, save: Boolean = true) =
+fun Any.logV(tag: String = TAG, save: Boolean = true) = run {
     log(
         LEVEL.V,
         tag,
         this.toString(),
         save
     )
+}
 
-fun Any.logD(tag: String = TAG, save: Boolean = true) =
+
+fun Any.logD(tag: String = TAG, save: Boolean = true) = run {
     log(
         LEVEL.D,
         tag,
         this.toString(),
         save
     )
+}
 
-fun Any.logI(tag: String = TAG, save: Boolean = true) =
+
+fun Any.logI(tag: String = TAG, save: Boolean = true) = run {
     log(
         LEVEL.I,
         tag,
         this.toString(),
         save
     )
+}
 
-fun Any.logW(tag: String = TAG, save: Boolean = true) =
+
+fun Any.logW(tag: String = TAG, save: Boolean = true) = run {
     log(
         LEVEL.W,
         tag,
         this.toString(),
         save
     )
+}
 
-fun Any.logE(tag: String = TAG, save: Boolean = true) =
+
+fun Any.logE(tag: String = TAG, save: Boolean = true) = run {
     log(
         LEVEL.E,
         tag,
         this.toString(),
         save
     )
+}
 
 
-fun Any.logJson(tag: String = TAG, save: Boolean = true) =
+fun Any.logJson(tag: String = TAG, save: Boolean = true) = run {
     log(
         LEVEL.JSON,
         tag,
         this.toString(),
         save
     )
+}
 
-fun Any.logXml(tag: String = TAG, save: Boolean = true) =
+
+fun Any.logXml(tag: String = TAG, save: Boolean = true) = run {
     log(
         LEVEL.XML,
         tag,
         this.toString(),
         save
     )
+}
 
-//这两个方法为了java代码方便调用
+//次方法不会保存数据
 fun Any.log() = run {
-    this.log(TAG, LEVEL.I, true)
-}
-//这两个方法为了java代码方便调用
-fun Any.log(tag: String = TAG) = run {
-    this.log(tag, LEVEL.I, true)
+    this.logI(save = false)
 }
 
-fun Any.log(tag: String = TAG, level: LEVEL = LEVEL.I, save: Boolean = true) = run {
-    log(level, tag, this.toString(), save)
+//次方法不会保存数据
+fun Any.log(tag: String = TAG) = run {
+    this.logI(tag, save = false)
 }
+
+fun Any.logE() = run {
+    this.logE(TAG, true)
+}
+
+fun Any.logE(tag: String = TAG) = run {
+    this.logE(tag, true)
+}
+
+fun Any.logD() = run {
+    this.logD(TAG, true)
+}
+
+fun Any.logD(tag: String = TAG) = run {
+    this.logD(tag, true)
+}
+
+
 
 /**
  * 当前线程
  */
 fun logCurrentThreadName(tag: String = TAG, save: Boolean = true) = run {
     log(LEVEL.I, tag, Thread.currentThread().name, save)
+}
+
+fun logCurrentThreadName() = run {
+    logCurrentThreadName(TAG, true)
 }
 
 

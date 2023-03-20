@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.github.oooo7777777'
-version = '1.0.6'
+version = '1.0.7'
 
 afterEvaluate {
     publishing {
@@ -15,7 +15,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.v.log'
                 artifactId = 'vlog'
-                version = '1.0.6'
+                version = '1.0.7'
             }
         }
     }
