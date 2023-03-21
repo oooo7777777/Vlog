@@ -24,12 +24,17 @@ class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallback
             RC_STORAGE_PERM,
             *WRITE_AND_READ_STORAGE
         )
+        VLog.getDefaultLogPath().log()//获取当前日志文件夹目录
+        VLog.getTodayFilePath().log()//获取今日日志
+        //获取所有日志文件
+        VLog.getFilesAll().forEach {
+            it.log()
+        }
     }
 
     fun writeFile(view: View?) {
         if (hasWriteAndReadPermissions()) {
             "hello VLog".logI()
-            "hello VLog".log()
             Toast.makeText(this@MainActivity, "success", Toast.LENGTH_LONG).show()
         }
     }

@@ -4,6 +4,11 @@ import android.content.Context;
 import android.text.TextUtils;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
 public class ConfigCenter {
     /**
@@ -157,5 +162,39 @@ public class ConfigCenter {
         }
         return mPath;
     }
+
+    /**
+     * 获取目录下面的所有文件日志
+     */
+    public List<String> getFilesAll() {
+        File file = new File(getDefaultLogPath());
+        File[] files = file.listFiles();
+        if (files == null) {
+            return null;
+        }
+        List<String> s = new ArrayList<>();
+        for (int i = 0; i < files.length; i++) {
+            s.add(files[i].getAbsolutePath());
+        }
+        return s;
+    }
+
+    /**
+     * 获取今天日志
+     *
+     * @return
+     */
+    public String getTodayFilePath() {
+        SimpleDateFormat dateFormatFile = new SimpleDateFormat("yyyy-MM-dd", Locale.US);//日期格式;
+        String path = getDefaultLogPath() + "/" + dateFormatFile.format(new Date()) + ".log";
+
+        File logFile = new File(path);
+        if (logFile.exists()) {
+            return path;
+        } else {
+            return "";
+        }
+    }
+
 
 }

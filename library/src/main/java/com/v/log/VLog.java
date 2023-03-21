@@ -11,6 +11,8 @@ import com.v.log.logger.ALogger;
 import com.v.log.logger.Logger;
 import com.v.log.util.NetworkManager;
 
+import java.util.List;
+
 import me.weishu.reflection.Reflection;
 
 public final class VLog {
@@ -78,12 +80,19 @@ public final class VLog {
         return "";
     }
 
+    public static List<String> getFilesAll() {
+        return ConfigCenter.getInstance().getFilesAll();
+    }
+
+    public static String getTodayFilePath() {
+        return ConfigCenter.getInstance().getTodayFilePath();
+    }
+
     public static void clearLogPrinters() {
         sLogger.clearLogPrinters();
         sAndroidLogPrinter = null;
         sDiskLogPrinter = null;
     }
-
 
     public static void log(int priority, String tag, Boolean save, String message, Throwable throwable) {
         sLogger.log(priority, tag, save, message, throwable);
@@ -122,7 +131,6 @@ public final class VLog {
     public static void xml(String tag, Boolean save, String xml) {
         sLogger.xml(tag, save, xml);
     }
-
 
     /**
      * 立即写入到文件，在上传日志的时候调用
