@@ -3,7 +3,6 @@ package com.v.log.Printer;
 import android.content.Context;
 
 import com.v.log.encrypt.LogEncrypt;
-import com.v.log.logger.Logger;
 import com.v.log.stragety.CsvFormatStrategy;
 import com.v.log.stragety.DiskDailyLogStrategy;
 import com.v.log.stragety.DiskLogStrategy;
@@ -38,15 +37,12 @@ public class DiskLogPrinter implements DiskLogStrategy, Printer {
         formatStrategy.writeCommonInfo();
     }
 
-    @Override
-    public boolean isLoggable(int priority, String tag) {
-        return priority > Logger.DEBUG;
-    }
 
     @Override
-    public void log(int priority, String tag, String message, Boolean save) {
-        formatStrategy.log(priority, tag, message,save);
+    public void log(int priority, String tag, String message, Boolean save, Boolean show) {
+        formatStrategy.log(priority, tag, message, save, show);
     }
+
 
     @Override
     public void flush() {

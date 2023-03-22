@@ -2,14 +2,13 @@ package com.v.log.stragety;
 
 import android.content.Context;
 import android.os.Build;
-import android.util.Log;
 
+import com.v.log.ALogThreadPool;
 import com.v.log.config.ConfigCenter;
 import com.v.log.encrypt.LogEncrypt;
-import com.v.log.util.NetworkManager;
-import com.v.log.ALogThreadPool;
 import com.v.log.io.LightLog;
 import com.v.log.util.LogUtils;
+import com.v.log.util.NetworkManager;
 
 public class DiskDailyLogStrategy implements DiskLogStrategy {
 
@@ -58,16 +57,15 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
     }
 
     @Override
-    public void log(int level, String tag, final String message, Boolean save) {
-        //是否需要保存在本地
-        if (ConfigCenter.getInstance().getSaveLog() && save) {
-            ALogThreadPool.getFixedThreadPool().execute(new Runnable() {
-                @Override
-                public void run() {
-                    writeLog(message);
-                }
-            });
-        }
+    public void log(int level, String tag, final String message, Boolean save, Boolean show) {
+        //保存在本地
+        ALogThreadPool.getFixedThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                writeLog(message);
+            }
+        });
+
     }
 
     @Override

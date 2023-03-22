@@ -1,11 +1,8 @@
 package com.v.log;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
 
-import com.v.log.Printer.AndroidLogPrinter;
 import com.v.log.Printer.DiskLogPrinter;
-import com.v.log.Printer.Printer;
 import com.v.log.config.ConfigCenter;
 import com.v.log.logger.ALogger;
 import com.v.log.logger.Logger;
@@ -19,11 +16,9 @@ public final class VLog {
 
     private static Logger sLogger = new ALogger();
     private static DiskLogPrinter sDiskLogPrinter = null;
-    private static AndroidLogPrinter sAndroidLogPrinter = null;
 
 
     private VLog() {
-        //no instance
     }
 
     public static void init(LogConfig logConfig) {
@@ -31,19 +26,11 @@ public final class VLog {
             throw new RuntimeException("LogConfig can't be null");
         }
         ConfigCenter configCenter = ConfigCenter.getInstance();
-        if (sDiskLogPrinter == null && sAndroidLogPrinter == null) {
+        if (sDiskLogPrinter == null) {
             final Context applicationContext = logConfig.getContext().getApplicationContext();
             configCenter.setContext(applicationContext);
             sDiskLogPrinter = new DiskLogPrinter(logConfig.getContext(), logConfig.getLogEncrypt());
-            sAndroidLogPrinter = new AndroidLogPrinter() {
-                @Override
-                public boolean isLoggable(int priority, String tag) {
-                    return 0 != (applicationContext.getApplicationInfo().flags
-                            & ApplicationInfo.FLAG_DEBUGGABLE);
-                }
-            };
             sLogger.addPrinter(sDiskLogPrinter);
-            sLogger.addPrinter(sAndroidLogPrinter);
             NetworkManager.getInstance().registerNetworChangeListener(applicationContext);
         }
         configCenter.setMaxKeepDaily(logConfig.getMaxKeepDaily());
@@ -52,7 +39,8 @@ public final class VLog {
         configCenter.setmCachePath(logConfig.getCachePath());
         configCenter.setSaveLog(logConfig.getSaveLog());
         configCenter.setShowLog(logConfig.getShowLog());
-        configCenter.setShowSaveLog(logConfig.getShowSaveLog());
+        configCenter.setShowDetailedLog(logConfig.getShowDetailedLog());
+        configCenter.setBeautifyLog(logConfig.getBeautifyLog());
 
         try {
             Reflection.unseal(logConfig.getContext());
@@ -61,17 +49,11 @@ public final class VLog {
         }
     }
 
-    public static void setLogger(Logger logger) {
-        sLogger = logger;
-    }
 
     public static Logger getLogger() {
         return sLogger;
     }
 
-    public static void addLogPrinter(Printer printer) {
-        sLogger.addPrinter(printer);
-    }
 
     public static String getDefaultLogPath() {
         if (sDiskLogPrinter != null) {
@@ -90,46 +72,26 @@ public final class VLog {
 
     public static void clearLogPrinters() {
         sLogger.clearLogPrinters();
-        sAndroidLogPrinter = null;
         sDiskLogPrinter = null;
     }
 
-    public static void log(int priority, String tag, Boolean save, String message, Throwable throwable) {
-        sLogger.log(priority, tag, save, message, throwable);
-    }
 
-    public static void d(String tag, Boolean save, String message, Object... args) {
-        sLogger.d(tag, save, message, args);
+    public static void d(String tag, Boolean save, String message) {
+        sLogger.d(tag, save, message);
     }
 
 
-    public static void e(String tag, Boolean save, String message, Object... args) {
-        sLogger.e(tag, save, message, args);
+    public static void e(String tag, Boolean save, String message) {
+        sLogger.e(tag, save, message);
     }
 
-    public static void e(String tag, Boolean save, Throwable throwable, String message, Object... args) {
-        sLogger.e(tag, save, throwable, message, args);
-    }
-
-    public static void i(String tag, Boolean save, String message, Object... args) {
-        sLogger.i(tag, save, message, args);
-    }
-
-    public static void v(String tag, Boolean save, String message, Object... args) {
-        sLogger.v(tag, save, message, args);
-    }
-
-    public static void w(String tag, Boolean save, String message, Object... args) {
-        sLogger.w(tag, save, message, args);
+    public static void i(String tag, Boolean save, Boolean show, String message) {
+        sLogger.i(tag, save, show, message);
     }
 
 
-    public static void json(String tag, Boolean save, String json) {
-        sLogger.json(tag, save, json);
-    }
-
-    public static void xml(String tag, Boolean save, String xml) {
-        sLogger.xml(tag, save, xml);
+    public static void w(String tag, Boolean save, String message) {
+        sLogger.w(tag, save, message);
     }
 
     /**
@@ -138,6 +100,5 @@ public final class VLog {
     public static void flush() {
         sLogger.flush();
     }
-
 
 }

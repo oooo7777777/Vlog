@@ -81,7 +81,7 @@ public final class LogUtils {
             for (int i = 0; i < elements.length; ++i) {
                 StackTraceElement element = elements[i];
                 if (TextUtils.equals(element.getClassName(), VLog.class.getName())) {
-                    classHierarchy = i + 4;
+                    classHierarchy = i + 3;
                     break;
                 }
             }

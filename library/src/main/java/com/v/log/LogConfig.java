@@ -43,9 +43,14 @@ public class LogConfig {
     private Boolean showLog = true;
 
     /**
-     * 是否打印保存日志
+     * 是否打印详情日志
      */
-    private Boolean showSaveLog = false;
+    private Boolean showDetailedLog = true;
+
+    /**
+     * 是否美化日志格式
+     */
+    private Boolean beautifyLog = true;
 
     /**
      * 是否保存所有日志
@@ -119,12 +124,20 @@ public class LogConfig {
         this.showLog = mShowLog;
     }
 
-    public Boolean getShowSaveLog() {
-        return showSaveLog;
+    public Boolean getShowDetailedLog() {
+        return showDetailedLog;
     }
 
-    public void setShowSaveLog(Boolean showSaveLog) {
-        this.showSaveLog = showSaveLog;
+    public void setShowDetailedLog(Boolean showDetailedLog) {
+        this.showDetailedLog = showDetailedLog;
+    }
+
+    public Boolean getBeautifyLog() {
+        return beautifyLog;
+    }
+
+    public void setBeautifyLog(Boolean beautifyLog) {
+        this.beautifyLog = beautifyLog;
     }
 
     public Boolean getSaveLog() {

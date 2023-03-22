@@ -3,6 +3,8 @@ package com.v.log.config;
 import android.content.Context;
 import android.text.TextUtils;
 
+import com.v.log.util.DateUtil;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -48,9 +50,14 @@ public class ConfigCenter {
     private Boolean showLog = true;
 
     /**
-     * 是否打印保存日志
+     * 是否打印详情日志
      */
-    private Boolean showSaveLog = false;
+    private Boolean showDetailedLog = false;
+
+    /**
+     * 是否美化日志格式
+     */
+    private Boolean beautifyLog = true;
 
     /**
      * 是否保存所有日志
@@ -93,12 +100,20 @@ public class ConfigCenter {
         this.showLog = showLog;
     }
 
-    public Boolean getShowSaveLog() {
-        return showSaveLog;
+    public Boolean getShowDetailedLog() {
+        return showDetailedLog;
     }
 
-    public void setShowSaveLog(Boolean showSaveLog) {
-        this.showSaveLog = showSaveLog;
+    public void setShowDetailedLog(Boolean showDetailedLog) {
+        this.showDetailedLog = showDetailedLog;
+    }
+
+    public Boolean getBeautifyLog() {
+        return beautifyLog;
+    }
+
+    public void setBeautifyLog(Boolean beautifyLog) {
+        this.beautifyLog = beautifyLog;
     }
 
     public Boolean getSaveLog() {
@@ -181,13 +196,9 @@ public class ConfigCenter {
 
     /**
      * 获取今天日志
-     *
-     * @return
      */
     public String getTodayFilePath() {
-        SimpleDateFormat dateFormatFile = new SimpleDateFormat("yyyy-MM-dd", Locale.US);//日期格式;
-        String path = getDefaultLogPath() + "/" + dateFormatFile.format(new Date()) + ".log";
-
+        String path = getDefaultLogPath() + "/" + DateUtil.getCurrentDate() + ".log";
         File logFile = new File(path);
         if (logFile.exists()) {
             return path;

@@ -1,16 +1,16 @@
 package com.v.demo
 
 import android.Manifest
-import androidx.appcompat.app.AppCompatActivity
-import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks
-import pub.devrel.easypermissions.EasyPermissions.RationaleCallbacks
 import android.os.Bundle
 import android.view.View
-import com.v.log.VLog
-import com.v.log.LogConfig
-import pub.devrel.easypermissions.EasyPermissions
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.v.log.LogConfig
+import com.v.log.VLog
 import com.v.log.util.*
+import pub.devrel.easypermissions.EasyPermissions
+import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks
+import pub.devrel.easypermissions.EasyPermissions.RationaleCallbacks
 
 class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallbacks {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,8 +34,19 @@ class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallback
 
     fun writeFile(view: View?) {
         if (hasWriteAndReadPermissions()) {
-            "hello VLog".logI()
+            "logD".logD()
+            Throwable("测试").logE()
+            "错误".logE()
+            "logE".logE("hahhahha")
+            "logW".logW()
+            "logI".logI()
+            "只打印3333333333".log()
+            "只保存444444444444".logSave()
+
+            JavaDemo().test()
+
             Toast.makeText(this@MainActivity, "success", Toast.LENGTH_LONG).show()
+
         }
     }
 

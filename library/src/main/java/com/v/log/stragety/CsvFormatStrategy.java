@@ -4,9 +4,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
-import com.v.log.VLog;
 import com.v.log.config.ConfigCenter;
-import com.v.log.util.LogExtKt;
 import com.v.log.util.LogUtils;
 
 import java.text.SimpleDateFormat;
@@ -22,6 +20,15 @@ public class CsvFormatStrategy implements DiskLogStrategy {
     private final Date date;
     private final SimpleDateFormat dateFormat;
     private final DiskLogStrategy logStrategy;
+
+    private static final int CHUNK_SIZE = 4000;
+
+    private static final char TOP_LEFT_CORNER = '┌';
+    private static final char BOTTOM_LEFT_CORNER = '└';
+    private static final char HORIZONTAL_LINE = '│';
+    private static final String DOUBLE_DIVIDER = "────────────────────────────────────────────────────────";
+    private static final String TOP_BORDER = TOP_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
+    private static final String BOTTOM_BORDER = BOTTOM_LEFT_CORNER + DOUBLE_DIVIDER + DOUBLE_DIVIDER;
 
     private CsvFormatStrategy(Builder builder) {
         date = new Date();
@@ -40,7 +47,7 @@ public class CsvFormatStrategy implements DiskLogStrategy {
     }
 
     @Override
-    public void log(int priority, String onceOnlyTag, String message, Boolean save) {
+    public void log(int priority, String onceOnlyTag, String message, Boolean save, Boolean show) {
 
         date.setTime(System.currentTimeMillis());
 
@@ -48,8 +55,8 @@ public class CsvFormatStrategy implements DiskLogStrategy {
         // time
         builder.append(dateFormat.format(date));
         builder.append(SEPARATOR);
-//        builder.append(Thread.currentThread().getId());
-//        builder.append(SEPARATOR);
+        builder.append(Thread.currentThread().getId());
+        builder.append(SEPARATOR);
         builder.append(Thread.currentThread().getName());
         builder.append(SEPARATOR);
         builder.append(LogUtils.logLevel(priority));
@@ -65,16 +72,69 @@ public class CsvFormatStrategy implements DiskLogStrategy {
             builder.append(SEPARATOR);
             builder.append(classAndMethodName.second);
         }
-        builder.append(SEPARATOR);
+        builder.append("\n");
         builder.append(csvFormatHandle(message));
         builder.append(NEW_LINE);
 
-        if (ConfigCenter.getInstance().getShowSaveLog()) {
-            Log.i(LogExtKt.TAG, builder.toString());
+
+        //打印日志
+        if (ConfigCenter.getInstance().getShowLog() && show) {
+            //打印详细日志
+            if (ConfigCenter.getInstance().getShowDetailedLog()) {
+                logFormat(priority, onceOnlyTag, builder.toString());
+            } else {
+                if (ConfigCenter.getInstance().getBeautifyLog()) {
+                    logFormat(priority, onceOnlyTag, message);
+                } else {
+                    Log.println(priority, onceOnlyTag, message);
+                }
+            }
         }
 
-        logStrategy.log(priority, onceOnlyTag, builder.toString(), save);
+        //是否需要保存在本地
+        if (ConfigCenter.getInstance().getSaveLog() && save) {
+            logStrategy.log(priority, onceOnlyTag, builder.toString(), save, show);
+        }
     }
+
+    //日志美化
+    private void logFormat(int priority, String onceOnlyTag, String message) {
+        logTopBorder(priority, onceOnlyTag);
+
+        byte[] bytes = message.getBytes();
+        int length = bytes.length;
+        if (length <= CHUNK_SIZE) {
+            logContent(priority, onceOnlyTag, message);
+            logBottomBorder(priority, onceOnlyTag);
+            return;
+        }
+        for (int i = 0; i < length; i += CHUNK_SIZE) {
+            int count = Math.min(length - i, CHUNK_SIZE);
+            logContent(priority, onceOnlyTag, new String(bytes, i, count));
+        }
+        logBottomBorder(priority, onceOnlyTag);
+    }
+
+    private void logTopBorder(int logType, String tag) {
+        logChunk(logType, tag, TOP_BORDER);
+    }
+
+    private void logBottomBorder(int logType, String tag) {
+        logChunk(logType, tag, BOTTOM_BORDER);
+    }
+
+
+    private void logContent(int logType, String tag, String chunk) {
+        String[] lines = chunk.split(System.getProperty("line.separator"));
+        for (String line : lines) {
+            logChunk(logType, tag, HORIZONTAL_LINE + " " + line);
+        }
+    }
+
+    private void logChunk(int priority, String tag, String chunk) {
+        Log.println(priority, tag, chunk);
+    }
+
 
     @Override
     public void flush() {
