@@ -44,6 +44,13 @@ fun Any.log() = run {
         show = true
     )
 }
+fun Any.log(tag: String = TAG) = run {
+    this.toString().showLogI(
+        tag,
+        save = false,
+        show = true
+    )
+}
 
 /**
  * 此方法保存日志不会打印日志
