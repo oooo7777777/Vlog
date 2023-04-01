@@ -57,7 +57,11 @@ public class CsvFormatStrategy implements DiskLogStrategy {
         builder.append(SEPARATOR);
         builder.append(Thread.currentThread().getId());
         builder.append(SEPARATOR);
-        builder.append(Thread.currentThread().getName());
+        String threadName = Thread.currentThread().getName();
+        if (threadName.contains("OkHttp")) {
+            threadName = "OkHttp";
+        }
+        builder.append(threadName);
         builder.append(SEPARATOR);
         builder.append(LogUtils.logLevel(priority));
         builder.append(SEPARATOR);
@@ -73,7 +77,11 @@ public class CsvFormatStrategy implements DiskLogStrategy {
             builder.append(classAndMethodName.second);
         }
         builder.append("\n");
-        builder.append(csvFormatHandle(message));
+        if (threadName.contains("OkHttp")) {
+            builder.append(message);
+        } else {
+            builder.append(csvFormatHandle(message));
+        }
         builder.append(NEW_LINE);
 
 
