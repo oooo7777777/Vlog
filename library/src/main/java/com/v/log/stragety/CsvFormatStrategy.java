@@ -77,11 +77,7 @@ public class CsvFormatStrategy implements DiskLogStrategy {
             builder.append(classAndMethodName.second);
         }
         builder.append("\n");
-        if (threadName.contains("OkHttp")) {
-            builder.append(message);
-        } else {
-            builder.append(csvFormatHandle(message));
-        }
+        builder.append(message);
         builder.append(NEW_LINE);
 
 
