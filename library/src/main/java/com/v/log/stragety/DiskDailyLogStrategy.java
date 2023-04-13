@@ -7,6 +7,7 @@ import com.v.log.ALogThreadPool;
 import com.v.log.config.ConfigCenter;
 import com.v.log.encrypt.LogEncrypt;
 import com.v.log.io.LightLog;
+import com.v.log.util.LogExtKt;
 import com.v.log.util.LogUtils;
 import com.v.log.util.NetworkManager;
 
@@ -78,7 +79,11 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
         if (null != logEncrypt) {
             message = logEncrypt.encrypt(message);
         }
-        LightLog.newInstance().write(message.getBytes());
+        try {
+            LightLog.newInstance().write(message.getBytes());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static Builder newBuilder() {

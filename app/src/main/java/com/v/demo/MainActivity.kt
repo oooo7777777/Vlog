@@ -30,6 +30,13 @@ class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallback
         VLog.getFilesAll().forEach {
             it.log()
         }
+
+        val sb = StringBuffer()
+        repeat(1000)
+        {
+            sb.append("获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录")
+        }
+        sb.logI()
     }
 
     fun writeFile(view: View?) {
