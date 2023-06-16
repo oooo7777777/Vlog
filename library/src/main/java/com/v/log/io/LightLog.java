@@ -181,9 +181,9 @@ public class LightLog {
             if (mbbi != null) {
                 mbbi.put(log);
             }
-            e.printStackTrace();
+//            e.printStackTrace();
         } catch (ReadOnlyBufferException e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 

@@ -82,7 +82,7 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
         try {
             LightLog.newInstance().write(message.getBytes());
         } catch (Exception e) {
-            e.printStackTrace();
+
         }
     }
 
