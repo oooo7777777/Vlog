@@ -10,6 +10,8 @@ import com.v.log.util.NetworkManager;
 
 import java.util.List;
 
+import me.weishu.reflection.Reflection;
+
 public final class VLog {
 
     private static Logger sLogger = new ALogger();
@@ -40,11 +42,11 @@ public final class VLog {
         configCenter.setShowDetailedLog(logConfig.getShowDetailedLog());
         configCenter.setBeautifyLog(logConfig.getBeautifyLog());
 
-//        try {
-//            Reflection.unseal(logConfig.getContext());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            Reflection.unseal(logConfig.getContext());
+        } catch (Exception e) {
+
+        }
     }
 
 

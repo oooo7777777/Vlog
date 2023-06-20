@@ -32,7 +32,7 @@ VLog 是一个基于mmap， 高性能，高可用的，无丢失的，简单易�
 
    ```groovy
    dependencies {
-   	        implementation 'com.github.oooo7777777:Vlog:1.0.4'
+   	        implementation 'com.github.oooo7777777:Vlog:1.1.5'
    	}
    ```
 
