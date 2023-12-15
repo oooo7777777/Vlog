@@ -81,11 +81,12 @@ public class ALogger implements Logger {
     private synchronized void log(int priority, Throwable throwable, String tag, Boolean save, Boolean show, String message) {
         String tagFormat = tag;
         if (!LogExtKt.TAG.equals(tag)) {
-            tagFormat =  LogExtKt.TAG + " [" + tag + "]";
+            tagFormat = tag;
         }
-        if (tag.length() > 70) {
-            tagFormat = tag.substring(0, 70);
+        if (tag.length() > 50) {
+            tagFormat = tag.substring(0, 50);
         }
+        tagFormat = LogExtKt.TAG + " [" + tagFormat + "]";
         log(priority, tagFormat, save, show, message, throwable);
     }
 

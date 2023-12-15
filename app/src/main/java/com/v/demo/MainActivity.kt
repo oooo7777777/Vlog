@@ -3,11 +3,19 @@ package com.v.demo
 import android.Manifest
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.v.log.LogConfig
 import com.v.log.VLog
-import com.v.log.util.*
+import com.v.log.util.ZipUtils.zipFolder
+import com.v.log.util.log
+import com.v.log.util.logD
+import com.v.log.util.logE
+import com.v.log.util.logI
+import com.v.log.util.logSave
+import com.v.log.util.logW
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.EasyPermissions
 import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks
 import pub.devrel.easypermissions.EasyPermissions.RationaleCallbacks
@@ -24,8 +32,10 @@ class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallback
             RC_STORAGE_PERM,
             *WRITE_AND_READ_STORAGE
         )
-        VLog.getDefaultLogPath().log()//获取当前日志文件夹目录
-        VLog.getTodayFilePath().log()//获取今日日志
+        VLog.getDefaultLogPath().log("获取当前日志文件夹目录")//获取当前日志文件夹目录
+        VLog.getTodayFilePath().log("获取今日日志")//获取今日日志
+
+
         //获取所有日志文件
         VLog.getFilesAll().forEach {
             it.log()
@@ -37,10 +47,26 @@ class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallback
             sb.append("获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录获取当前日志文件夹目录")
         }
         sb.logI()
+
+
+        //把日志文件打包成zip 并且返回zip地址
+        CoroutineScope(Dispatchers.Main).launch {
+            val zipFilePath = zipFolder(this@MainActivity)
+            ("ZIP 文件路径为：$zipFilePath").log()
+        }
+
     }
 
     fun writeFile(view: View?) {
         if (hasWriteAndReadPermissions()) {
+
+            try {
+
+            } catch (e: Exception) {
+                e.toString()
+            }
+
+
             "logD".logD()
             Throwable("测试").logE()
             "错误".logE()
@@ -51,8 +77,8 @@ class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallback
             "只保存444444444444".logSave()
 
             JavaDemo().test()
-
-            Toast.makeText(this@MainActivity, "success", Toast.LENGTH_LONG).show()
+//
+//            Toast.makeText(this@MainActivity, "success", Toast.LENGTH_LONG).show()
 
         }
     }
@@ -86,4 +112,6 @@ class MainActivity : AppCompatActivity(), PermissionCallbacks, RationaleCallback
             Manifest.permission.READ_EXTERNAL_STORAGE
         )
     }
+
+
 }

@@ -64,6 +64,7 @@ public class LogConfig {
 
     public LogConfig(Context context, Boolean showLog) {
         mContext = context;
+        AppException.getInstance().init(mContext);
         this.showLog = showLog;
     }
 
