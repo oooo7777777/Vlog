@@ -2,6 +2,7 @@ package com.v.log.stragety;
 
 import android.content.Context;
 import android.os.Build;
+import android.util.Log;
 
 import com.v.log.ALogThreadPool;
 import com.v.log.config.ConfigCenter;
@@ -42,6 +43,10 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
         });
     }
 
+    /**
+     * 获取设备信息
+     * @return
+     */
     private String getCommonInfo() {
         StringBuilder builder = new StringBuilder();
         builder.append(Build.BRAND);

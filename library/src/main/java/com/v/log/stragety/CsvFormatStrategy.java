@@ -50,7 +50,7 @@ public class CsvFormatStrategy implements DiskLogStrategy {
     public void log(int priority, String onceOnlyTag, String message, Boolean save, Boolean show) {
 
         date.setTime(System.currentTimeMillis());
-
+        String logLevel = LogUtils.logLevel(priority);
         StringBuilder builder = new StringBuilder();
         // time
         builder.append(dateFormat.format(date));
@@ -63,7 +63,7 @@ public class CsvFormatStrategy implements DiskLogStrategy {
         }
         builder.append(threadName);
         builder.append(SEPARATOR);
-        builder.append(LogUtils.logLevel(priority));
+        builder.append(logLevel);
         builder.append(SEPARATOR);
         builder.append(onceOnlyTag);
         Pair<String, String> classAndMethodName = LogUtils.getClassAndMethodName();
@@ -76,10 +76,11 @@ public class CsvFormatStrategy implements DiskLogStrategy {
             builder.append(SEPARATOR);
             builder.append(classAndMethodName.second);
         }
-        builder.append("\n");
+        if (builder.length() > 0) {
+            builder.append(NEW_LINE);
+        }
         builder.append(message);
         builder.append(NEW_LINE);
-
 
         //打印日志
         if (ConfigCenter.getInstance().getShowLog() && show) {
@@ -97,8 +98,10 @@ public class CsvFormatStrategy implements DiskLogStrategy {
 
         //是否需要保存在本地
         if (ConfigCenter.getInstance().getSaveLog() && save) {
-            builder.append("============================================================================================================================>\n");
-            logStrategy.log(priority, onceOnlyTag, builder.toString(), true, show);
+            StringBuilder sb = new StringBuilder();
+            sb.append("============================================================" + logLevel + "===========================================================>");
+            sb.append(NEW_LINE);
+            logStrategy.log(priority, onceOnlyTag, sb+builder.toString(), true, show);
         }
     }
 
@@ -130,9 +133,9 @@ public class CsvFormatStrategy implements DiskLogStrategy {
 
 
     private void logContent(int logType, String tag, String chunk) {
-        String[] lines = chunk.split(System.getProperty("line.separator"));
+        String[] lines = chunk.split(NEW_LINE);
         for (String line : lines) {
-            logChunk(logType, tag, HORIZONTAL_LINE + " " + line);
+            logChunk(logType, tag, HORIZONTAL_LINE + " " + line.trim());
         }
     }
 

@@ -1,6 +1,7 @@
 package com.v.demo
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import com.v.log.LogConfig
@@ -20,12 +21,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //初始化日志系统
         VLog.init(LogConfig(this, true))
         VLog.getDefaultLogPath().log("获取当前日志文件夹目录")//获取当前日志文件夹目录
         VLog.getTodayFilePath().log("获取今日日志")//获取今日日志
 
-        writeFile(null)
         //获取所有日志文件
         VLog.getFilesAll().forEach {
             it.log()
@@ -49,7 +48,6 @@ class MainActivity : AppCompatActivity() {
         "只打印3333333333".log()
         "只保存444444444444".logSave()
 
-        JavaDemo().test()
 
     }
 
