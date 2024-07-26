@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.github.oooo7777777'
-version = '1.2.2'
+version = '1.2.3'
 
 afterEvaluate {
     publishing {

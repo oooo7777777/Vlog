@@ -135,7 +135,7 @@ public class CsvFormatStrategy implements DiskLogStrategy {
     private void logContent(int logType, String tag, String chunk) {
         String[] lines = chunk.split(NEW_LINE);
         for (String line : lines) {
-            logChunk(logType, tag, HORIZONTAL_LINE + " " + line.trim());
+            logChunk(logType, tag, HORIZONTAL_LINE + " " + line);
         }
     }
 
