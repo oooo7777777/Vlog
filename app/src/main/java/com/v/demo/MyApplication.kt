@@ -19,7 +19,6 @@ class MyApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         context = this
-
         VLog.init(LogConfig(this, BuildConfig.DEBUG,true))
     }
 }
