@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        VLog.init(LogConfig(this, true))
         VLog.getDefaultLogPath().log("获取当前日志文件夹目录")//获取当前日志文件夹目录
         VLog.getTodayFilePath().log("获取今日日志")//获取今日日志
 
@@ -47,7 +46,6 @@ class MainActivity : AppCompatActivity() {
         "logI".logI()
         "只打印3333333333".log()
         "只保存444444444444".logSave()
-
 
     }
 

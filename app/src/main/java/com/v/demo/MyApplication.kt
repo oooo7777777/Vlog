@@ -20,6 +20,6 @@ class MyApplication : Application() {
         super.onCreate()
         context = this
 
-        VLog.init(LogConfig(this, BuildConfig.DEBUG))
+        VLog.init(LogConfig(this, BuildConfig.DEBUG,true))
     }
 }

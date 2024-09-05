@@ -62,9 +62,11 @@ public class LogConfig {
         mContext = context;
     }
 
-    public LogConfig(Context context, Boolean showLog) {
+    public LogConfig(Context context, Boolean showLog, boolean isCaptureExceptions) {
         mContext = context;
-        AppException.getInstance().init(mContext);
+        if (isCaptureExceptions) {
+            AppException.getInstance().init(mContext);
+        }
         this.showLog = showLog;
     }
 

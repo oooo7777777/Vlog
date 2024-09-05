@@ -1,35 +1,29 @@
 package com.v.log.util
 
+import android.util.Log
 import com.v.log.VLog
 
 const val TAG = "V_LOG"
 
 fun Any.logD() = run {
-    this.toString().showLogD(
+    this.showLog(
         TAG,
-        true
+        Log.DEBUG
     )
 }
 
 fun Any.logD(tag: String = TAG) = run {
-    this.toString().showLogD(
+    this.showLog(
         tag,
-        true
+        Log.DEBUG
     )
 }
 
 fun Any.logD(tag: String = TAG, save: Boolean = true) = run {
-    this.toString().showLogD(
+    this.showLog(
         tag,
+        Log.DEBUG,
         save
-    )
-}
-
-private fun Any.showLogD(tag: String = TAG, save: Boolean = true) = run {
-    VLog.d(
-        tag,
-        save,
-        this.toString()
     )
 }
 
@@ -38,17 +32,18 @@ private fun Any.showLogD(tag: String = TAG, save: Boolean = true) = run {
  * 此方法会打印日志不会保存日志
  */
 fun Any.log() = run {
-    this.toString().showLogI(
+    this.showLog(
         TAG,
-        save = false,
-        show = true
+        Log.INFO,
+        saveLog = false
     )
 }
+
 fun Any.log(tag: String = TAG) = run {
-    this.toString().showLogI(
+    this.showLog(
         tag,
-        save = false,
-        show = true
+        Log.INFO,
+        saveLog = false
     )
 }
 
@@ -56,105 +51,131 @@ fun Any.log(tag: String = TAG) = run {
  * 此方法保存日志不会打印日志
  */
 fun Any.logSave() = run {
-    this.toString().showLogI(
+    this.showLog(
         TAG,
-        save = true,
-        show = false
+        Log.INFO,
+        saveLog = true,
+        showLog = false
     )
 }
 
 
 fun Any.logI() = run {
-    this.toString().showLogI(
+    this.showLog(
         TAG,
-        save = true,
-        show = true
+        Log.INFO
     )
 }
 
 fun Any.logI(tag: String = TAG) = run {
-    this.toString().showLogI(
+    this.showLog(
         tag,
-        save = true,
-        show = true
+        Log.INFO
     )
 }
 
 fun Any.logI(tag: String = TAG, save: Boolean = true) = run {
-    this.toString().showLogI(
+    this.showLog(
         tag,
+        Log.INFO,
         save
-    )
-}
-
-
-private fun Any.showLogI(tag: String = TAG, save: Boolean = true, show: Boolean = true) = run {
-    VLog.i(
-        tag,
-        save,
-        show,
-        this.toString()
     )
 }
 
 
 fun Any.logW() = run {
-    this.toString().showLogW(
+    this.showLog(
         TAG,
-        true
+        Log.WARN
     )
 }
 
 fun Any.logW(tag: String = TAG) = run {
-    this.toString().showLogW(
+    this.showLog(
         tag,
-        true
+        Log.WARN
     )
 }
 
 fun Any.logW(tag: String = TAG, save: Boolean = true) = run {
-    this.toString().showLogW(
+    this.showLog(
         tag,
+        Log.WARN,
         save
-    )
-}
-
-
-private fun Any.showLogW(tag: String = TAG, save: Boolean = true) = run {
-    VLog.w(
-        tag,
-        save,
-        this.toString()
     )
 }
 
 
 fun Any.logE() = run {
-    this.toString().showLogE(
+    this.showLog(
         TAG,
-        true
+        Log.ERROR
+
     )
 }
 
 fun Any.logE(tag: String = TAG) = run {
-    this.toString().showLogE(
+    this.showLog(
         tag,
-        true
+        Log.ERROR
     )
 }
 
 fun Any.logE(tag: String = TAG, save: Boolean = true) = run {
-    this.toString().showLogE(
+    this.showLog(
         tag,
+        Log.ERROR,
         save
     )
 }
 
-private fun Any.showLogE(tag: String = TAG, save: Boolean = true) = run {
-    VLog.e(
-        tag,
-        save,
-        this.toString()
-    )
+private fun Any.showLog(
+    tag: String = TAG,
+    level: Int = Log.INFO,
+    saveLog: Boolean = true,
+    showLog: Boolean = true
+) = run {
+
+    var msg = this.toString()
+    if (this is Throwable) {
+        msg = Log.getStackTraceString(this)
+    }
+
+    when (level) {
+        Log.DEBUG -> {
+            VLog.d(
+                tag,
+                saveLog,
+                msg
+            )
+        }
+
+        Log.WARN -> {
+            VLog.w(
+                tag,
+                saveLog,
+                msg
+            )
+        }
+
+        Log.ERROR -> {
+            VLog.e(
+                tag,
+                saveLog,
+                msg
+            )
+        }
+
+        else -> {
+            VLog.i(
+                tag,
+                saveLog,
+                showLog,
+                msg
+            )
+        }
+
+    }
+
 }
 

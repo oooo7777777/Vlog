@@ -31,10 +31,15 @@ public class AppException implements Thread.UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread thread, Throwable exception) {
-        LogExtKt.logE(exception.getLocalizedMessage());
-        // 将异常抛出，应用会弹出异常对话框
-        defaultExceptionHandler.uncaughtException(thread, exception);
-
+        LogExtKt.logE(exception);
+        if (exception instanceof ArithmeticException) {
+            // 特定处理除零异常
+            System.exit(2);
+        } else if (defaultExceptionHandler != null) {
+            defaultExceptionHandler.uncaughtException(thread, exception);
+        } else {
+            System.exit(2);
+        }
     }
 
     public void init(Context context) {
