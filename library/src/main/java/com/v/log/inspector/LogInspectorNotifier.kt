@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
+import android.graphics.Color
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
@@ -36,6 +37,7 @@ object LogInspectorNotifier {
         }
         val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_notify_more)
+            .setColor(Color.BLACK)
             .setContentTitle(
                 context.getString(
                     R.string.vlog_notification_title,

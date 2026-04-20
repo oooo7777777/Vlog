@@ -8,7 +8,7 @@ android {
     buildToolsVersion "30.0.3"
 
     defaultConfig {
-        applicationId "com.v.demo"
+        applicationId "com.v.vlog.demo"
         minSdkVersion 21
         targetSdkVersion 33
         versionCode 100
