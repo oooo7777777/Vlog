@@ -1,9 +1,13 @@
 package com.v.log;
 
 import android.content.Context;
+import android.content.Intent;
 
 import com.v.log.Printer.DiskLogPrinter;
 import com.v.log.config.ConfigCenter;
+import com.v.log.inspector.LogInspectorNotifier;
+import com.v.log.inspector.LogInspectorStore;
+import com.v.log.inspector.LogViewerActivity;
 import com.v.log.logger.ALogger;
 import com.v.log.logger.Logger;
 import com.v.log.util.NetworkManager;
@@ -26,8 +30,8 @@ public final class VLog {
             throw new RuntimeException("LogConfig can't be null");
         }
         ConfigCenter configCenter = ConfigCenter.getInstance();
+        final Context applicationContext = logConfig.getContext().getApplicationContext();
         if (sDiskLogPrinter == null) {
-            final Context applicationContext = logConfig.getContext().getApplicationContext();
             configCenter.setContext(applicationContext);
             sDiskLogPrinter = new DiskLogPrinter(logConfig.getContext(), logConfig.getLogEncrypt());
             sLogger.addPrinter(sDiskLogPrinter);
@@ -41,6 +45,8 @@ public final class VLog {
         configCenter.setShowLog(logConfig.getShowLog());
         configCenter.setShowDetailedLog(logConfig.getShowDetailedLog());
         configCenter.setBeautifyLog(logConfig.getBeautifyLog());
+        LogInspectorStore.INSTANCE.setEnabled(Boolean.TRUE.equals(logConfig.getEnableLogInspector()));
+        LogInspectorNotifier.INSTANCE.setup(applicationContext, Boolean.TRUE.equals(logConfig.getEnableLogInspector()));
 
         try {
             Reflection.unseal(logConfig.getContext());
@@ -99,6 +105,12 @@ public final class VLog {
      */
     public static void flush() {
         sLogger.flush();
+    }
+
+    public static void openLogViewer(Context context) {
+        Intent intent = new Intent(context, LogViewerActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
 }

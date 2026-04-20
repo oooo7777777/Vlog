@@ -3,6 +3,9 @@ package com.v.log.logger;
 import android.text.TextUtils;
 
 import com.v.log.Printer.Printer;
+import com.v.log.config.ConfigCenter;
+import com.v.log.inspector.LogInspectorNotifier;
+import com.v.log.inspector.LogInspectorStore;
 import com.v.log.util.LogExtKt;
 import com.v.log.util.LogUtils;
 
@@ -49,6 +52,12 @@ public class ALogger implements Logger {
         }
         if (TextUtils.isEmpty(message)) {
             message = "Empty/NULL log message";
+        }
+        if (LogInspectorStore.INSTANCE.isEnabled()) {
+            LogInspectorStore.INSTANCE.add(priority, tag, Thread.currentThread().getName(), message);
+            if (ConfigCenter.getInstance().peekContext() != null) {
+                LogInspectorNotifier.INSTANCE.update(ConfigCenter.getInstance().peekContext());
+            }
         }
 
         for (Printer printer : logPrinters) {

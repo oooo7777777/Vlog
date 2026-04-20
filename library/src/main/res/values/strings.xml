@@ -1,3 +1,29 @@
 <resources>
     <string name="app_name">Log_core</string>
+    <string name="vlog_viewer_title">VLog Inspector</string>
+    <string name="vlog_notification_channel_name">VLog Inspector</string>
+    <string name="vlog_notification_channel_desc">Show recent in-app logs</string>
+    <string name="vlog_notification_title">VLog Inspector (%1$d)</string>
+    <string name="vlog_notification_empty">Tap to open log viewer</string>
+    <string name="vlog_filter_hint">Filter by tag or time</string>
+    <string name="vlog_level_all">All</string>
+    <string name="vlog_level_debug">DEBUG</string>
+    <string name="vlog_level_info">INFO</string>
+    <string name="vlog_level_warn">WARN</string>
+    <string name="vlog_level_error">ERROR</string>
+    <string name="vlog_clear">Clear</string>
+    <string name="vlog_share">Share</string>
+    <string name="vlog_copied">Copied</string>
+    <string name="vlog_nothing_to_share">No logs to share</string>
+    <string name="vlog_share_title">Share logs</string>
+    <string name="vlog_menu_more">More</string>
+    <string name="vlog_local_files_title">Local logs</string>
+    <string name="vlog_local_files_empty">No local log files</string>
+    <string name="vlog_local_files_delete_all">Delete all local logs</string>
+    <string name="vlog_local_files_deleted">Deleted %1$d local log files</string>
+    <string name="vlog_local_file_no_entries">No log entries in this file</string>
+    <string name="vlog_viewer_title_local">VLog Inspector - %1$s</string>
+    <string name="vlog_local_files_summary">%1$d local log files saved on this device</string>
+    <string name="vlog_local_files_open">Open</string>
+    <string name="vlog_local_file_meta">%1$s · %2$s</string>
 </resources>

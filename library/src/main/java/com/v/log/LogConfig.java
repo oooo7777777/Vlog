@@ -57,6 +57,11 @@ public class LogConfig {
      */
     private Boolean saveLog = true;
 
+    /**
+     * 是否开启应用内日志面板和通知栏入口
+     */
+    private Boolean enableLogInspector = false;
+
 
     public LogConfig(Context context) {
         mContext = context;
@@ -149,5 +154,14 @@ public class LogConfig {
 
     public void setSaveLog(Boolean saveLog) {
         this.saveLog = saveLog;
+    }
+
+    public Boolean getEnableLogInspector() {
+        return enableLogInspector;
+    }
+
+    public LogConfig setEnableLogInspector(Boolean enableLogInspector) {
+        this.enableLogInspector = enableLogInspector;
+        return this;
     }
 }

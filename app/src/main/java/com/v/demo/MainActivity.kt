@@ -53,5 +53,9 @@ class MainActivity : AppCompatActivity() {
         VLog.flush()
     }
 
+    fun openInspector(view: View?) {
+        VLog.openLogViewer(this)
+    }
+
 
 }

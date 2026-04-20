@@ -2,4 +2,15 @@
     package="com.v.log" >
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application>
+        <activity
+            android:name=".inspector.LocalLogFilesActivity"
+            android:exported="false"
+            android:label="@string/vlog_local_files_title" />
+        <activity
+            android:name=".inspector.LogViewerActivity"
+            android:exported="false"
+            android:label="@string/vlog_viewer_title" />
+    </application>
 </manifest>

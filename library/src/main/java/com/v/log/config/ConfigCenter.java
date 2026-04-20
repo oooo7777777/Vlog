@@ -151,6 +151,10 @@ public class ConfigCenter {
         return mContext;
     }
 
+    public Context peekContext() {
+        return mContext;
+    }
+
     public void setContext(Context context) {
         mContext = context;
     }
