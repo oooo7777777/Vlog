@@ -14,6 +14,11 @@ sdcard/Android/data/
 |日志记录通用信息|在日志系统初始化的时候，会一并记录App版本，手机型号等信息，网络切换的时候还会记录网络类型|
 |日志格式为CSV格式，方便后端解析展示|写日志的时候，会同时写入当前时间，线程ID，线程的名字，Log等级，以及当前所在类和方法的名字|
 |支持控制台打印日志信息|在写入日志到本地的同时，也会在控制台输出相应的日志信息|
+|全新优化的日志展示体验，更清晰直观|
+|无需连接设备即可实时查看日志|
+|支持历史日志查看与回溯|
+|支持日志一键分享与导出|
+
 
 ## 添加依赖
 
@@ -57,3 +62,16 @@ LogExtKt.log("hello VLog");
 ```
 VLog.flush();
 ```
+### 优美的日志输出
+![img1](./app/src/main/res/drawable/img1.png)
+
+### 无需连接设备即可实时查看日志
+![img2](./app/src/main/res/drawable/img2.png)
+![img3](./app/src/main/res/drawable/img3.png)
+![img4](./app/src/main/res/drawable/img4.png)
+![img5](./app/src/main/res/drawable/img5.png)
+
+### 历史日志查看与回溯
+![img6](./app/src/main/res/drawable/img6.png)
+
+
