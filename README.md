@@ -56,7 +56,10 @@ sdcard/Android/data/
 ## 初始化
 ```
 //初始化日志系统
-VLog.init(new LogConfig(this));
+ VLog.init(
+            LogConfig(this, BuildConfig.DEBUG, true)
+                .setEnableLogInspector(true)
+        )
 ```
 
 ## 打印日志(推荐使用kotlin方法)
