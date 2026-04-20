@@ -60,7 +60,10 @@ sdcard/Android/data/
 ```
 
 ## 开启通知栏日志入口
-添加权限<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+添加通知栏权限
+```
+uses-permission android:name="android.permission.POST_NOTIFICATIONS"
+```
 
 ```java
 VLog.init(
