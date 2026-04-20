@@ -19,6 +19,18 @@ sdcard/Android/data/
 |支持历史日志查看与回溯|
 |支持日志一键分享与导出|
 
+### 优美的日志输出
+![img1](./app/src/main/res/drawable/img1.png)
+
+### 无需连接设备即可实时查看日志
+![img2](./app/src/main/res/drawable/img2.png)
+![img3](./app/src/main/res/drawable/img3.png)
+![img4](./app/src/main/res/drawable/img4.png)
+![img5](./app/src/main/res/drawable/img5.png)
+
+### 历史日志查看与回溯
+![img6](./app/src/main/res/drawable/img6.png)
+
 
 ## 添加依赖
 
@@ -62,16 +74,6 @@ LogExtKt.log("hello VLog");
 ```
 VLog.flush();
 ```
-### 优美的日志输出
-![img1](./app/src/main/res/drawable/img1.png)
 
-### 无需连接设备即可实时查看日志
-![img2](./app/src/main/res/drawable/img2.png)
-![img3](./app/src/main/res/drawable/img3.png)
-![img4](./app/src/main/res/drawable/img4.png)
-![img5](./app/src/main/res/drawable/img5.png)
-
-### 历史日志查看与回溯
-![img6](./app/src/main/res/drawable/img6.png)
 
 
