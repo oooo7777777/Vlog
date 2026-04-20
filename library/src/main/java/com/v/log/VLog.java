@@ -113,4 +113,13 @@ public final class VLog {
         context.startActivity(intent);
     }
 
+    public static void setLogInspectorEnabled(boolean enabled) {
+        Context context = ConfigCenter.getInstance().peekContext();
+        if (context == null) {
+            throw new IllegalStateException("VLog must be initialized before toggling log inspector");
+        }
+        LogInspectorStore.INSTANCE.setEnabled(enabled);
+        LogInspectorNotifier.INSTANCE.setup(context, enabled);
+    }
+
 }
