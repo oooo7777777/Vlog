@@ -5,7 +5,7 @@
 
     <application>
         <provider
-            android:name="androidx.core.content.FileProvider"
+            android:name=".inspector.VLogFileProvider"
             android:authorities="${applicationId}.vlog.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
