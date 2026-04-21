@@ -4,19 +4,24 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.ListView
 import android.widget.ArrayAdapter
 import android.widget.AdapterView
 import android.widget.Spinner
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.v.log.R
 import com.v.log.logger.Logger
 import java.io.File
@@ -26,6 +31,8 @@ class LogViewerActivity : AppCompatActivity() {
 
     companion object {
         private const val EXTRA_LOCAL_LOG_FILE_PATH = "extra_local_log_file_path"
+        private const val LOCAL_PAGE_SIZE = 100
+        private const val LOCAL_LOAD_MORE_THRESHOLD = 15
 
         fun createIntent(context: Context, localLogFilePath: String? = null): Intent {
             return Intent(context, LogViewerActivity::class.java).apply {
@@ -37,19 +44,30 @@ class LogViewerActivity : AppCompatActivity() {
     private lateinit var adapter: LogViewerAdapter
     private lateinit var etFilter: EditText
     private lateinit var spinnerLevel: Spinner
+    private lateinit var listLogs: RecyclerView
     private var allLogs: List<LogEntry> = emptyList()
     private var selectedLevel: Int? = null
     private var localLogFilePath: String? = null
+    private var showFullMessage = false
+    private var localReader: LocalLogRepository.PagedReader? = null
+    private var localLoadedLogs = ArrayList<LogEntry>()
+    private var isLocalInitializing = false
+    private var isLocalLoadingMore = false
+    private var currentLocalFilePath: String? = null
     private val listener: () -> Unit = { runOnUiThread { render() } }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LogShareExporter.cleanupStaleFiles(this)
         setContentView(R.layout.vlog_activity_log_viewer)
         localLogFilePath = intent.getStringExtra(EXTRA_LOCAL_LOG_FILE_PATH)
         title = viewerTitle()
+        supportActionBar?.setDisplayHomeAsUpEnabled(isViewingLocalFile())
+        installTitleClickToggle()
 
         etFilter = findViewById(R.id.etFilter)
         spinnerLevel = findViewById(R.id.spinnerLevel)
+        listLogs = findViewById(R.id.listLogs)
         etFilter.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                 applyFilter()
@@ -93,8 +111,28 @@ class LogViewerActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
 
-        adapter = LogViewerAdapter(this) { copyEntry(it) }
-        findViewById<ListView>(R.id.listLogs).adapter = adapter
+        adapter = LogViewerAdapter(
+            this,
+            onClick = { openDetail(it) },
+            onLongClick = { copyEntry(it) }
+        )
+        adapter.setShowFullMessage(showFullMessage)
+        listLogs.layoutManager = LinearLayoutManager(this)
+        listLogs.adapter = adapter
+        listLogs.setHasFixedSize(false)
+        if (listLogs.itemDecorationCount == 0) {
+            listLogs.addItemDecoration(VerticalSpaceItemDecoration((8 * resources.displayMetrics.density).toInt()))
+        }
+        listLogs.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                if (!isViewingLocalFile() || dy <= 0 || isLocalInitializing || isLocalLoadingMore) return
+                val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+                val lastVisible = layoutManager.findLastVisibleItemPosition()
+                if (lastVisible >= adapter.itemCount - LOCAL_LOAD_MORE_THRESHOLD) {
+                    loadNextLocalPage()
+                }
+            }
+        })
 
         render()
     }
@@ -105,12 +143,21 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        menu.findItem(R.id.action_local_files)?.isVisible = !isViewingLocalFile()
         menu.findItem(R.id.action_clear)?.isVisible = !isViewingLocalFile()
+        menu.findItem(R.id.action_toggle_message_mode)?.title = getString(
+            if (showFullMessage) R.string.vlog_show_preview_mode else R.string.vlog_show_full_mode
+        )
         return super.onPrepareOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
             R.id.action_local_files -> {
                 startActivity(LocalLogFilesActivity.createIntent(this))
                 true
@@ -124,6 +171,13 @@ class LogViewerActivity : AppCompatActivity() {
 
             R.id.action_share -> {
                 shareLogs(adapter.currentItems())
+                true
+            }
+
+            R.id.action_toggle_message_mode -> {
+                showFullMessage = !showFullMessage
+                adapter.setShowFullMessage(showFullMessage)
+                invalidateOptionsMenu()
                 true
             }
 
@@ -147,7 +201,7 @@ class LogViewerActivity : AppCompatActivity() {
 
     private fun render() {
         if (isViewingLocalFile()) {
-            loadLocalLogs()
+            ensureLocalLogs()
         } else {
             allLogs = LogInspectorStore.snapshot().asReversed()
             applyFilter()
@@ -170,16 +224,13 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private fun copyEntry(entry: LogEntry) {
-        val text = buildString {
-            append("time=").append(LogInspectorStore.formatTime(entry.timestamp)).append('\n')
-            append("level=").append(entry.levelName).append('\n')
-            append("tag=").append(entry.tag).append('\n')
-            append("thread=").append(entry.thread).append('\n')
-            append("message=").append(entry.message)
-        }
         val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-        clipboard.setPrimaryClip(ClipData.newPlainText("vlog-entry", text))
+        clipboard.setPrimaryClip(ClipData.newPlainText("vlog-entry", entry.asClipboardText()))
         Toast.makeText(this, R.string.vlog_copied, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun openDetail(entry: LogEntry) {
+        startActivity(LogDetailActivity.createIntent(this, entry))
     }
 
     private fun shareLogs(entries: List<LogEntry>) {
@@ -187,20 +238,14 @@ class LogViewerActivity : AppCompatActivity() {
             Toast.makeText(this, R.string.vlog_nothing_to_share, Toast.LENGTH_SHORT).show()
             return
         }
-        val content = entries.joinToString("\n\n") { entry ->
-            buildString {
-                append(LogInspectorStore.formatTime(entry.timestamp)).append('\n')
-                append(entry.levelName).append('\n')
-                append(entry.tag).append('\n')
-                append(entry.thread).append('\n')
-                append(entry.message)
+        if (isViewingLocalFile()) {
+            val localFile = File(localLogFilePath.orEmpty())
+            if (localFile.exists()) {
+                LogShareExporter.shareExistingFile(this, localFile)
+                return
             }
         }
-        val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"
-            putExtra(Intent.EXTRA_TEXT, content)
-        }
-        startActivity(Intent.createChooser(intent, getString(R.string.vlog_share_title)))
+        LogShareExporter.shareEntriesAsTextFile(this, entries)
     }
 
     private fun isViewingLocalFile(): Boolean = !localLogFilePath.isNullOrEmpty()
@@ -216,17 +261,143 @@ class LogViewerActivity : AppCompatActivity() {
 
     private fun loadLocalLogs() {
         val path = localLogFilePath ?: return
+        currentLocalFilePath = path
+        localReader = null
+        localLoadedLogs = ArrayList()
         adapter.submit(emptyList())
         allLogs = emptyList()
+        isLocalInitializing = true
         thread {
-            val entries = LocalLogRepository.readEntries(File(path)).asReversed()
+            val reader = LocalLogRepository.openPagedReader(File(path), LOCAL_PAGE_SIZE)
+            val entries = reader?.readNextPage().orEmpty()
+            val hasMore = reader?.hasMore() == true
             runOnUiThread {
                 if (isFinishing || isDestroyed) return@runOnUiThread
-                allLogs = entries
+                isLocalInitializing = false
+                localReader = reader
+                localLoadedLogs.addAll(entries)
+                allLogs = localLoadedLogs.toList()
                 applyFilter()
-                if (entries.isEmpty()) {
+                if (entries.isEmpty() && !hasMore) {
                     Toast.makeText(this, R.string.vlog_local_file_no_entries, Toast.LENGTH_SHORT).show()
                 }
+            }
+        }
+    }
+
+    private fun ensureLocalLogs() {
+        val path = localLogFilePath ?: return
+        if (currentLocalFilePath != path || localReader == null && localLoadedLogs.isEmpty() && !isLocalInitializing) {
+            loadLocalLogs()
+            return
+        }
+        applyFilter()
+    }
+
+    private fun loadNextLocalPage() {
+        val reader = localReader ?: return
+        if (!reader.hasMore()) return
+        isLocalLoadingMore = true
+        thread {
+            val nextEntries = reader.readNextPage()
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                isLocalLoadingMore = false
+                if (nextEntries.isEmpty()) return@runOnUiThread
+                localLoadedLogs.addAll(nextEntries)
+                allLogs = localLoadedLogs.toList()
+                applyFilter()
+            }
+        }
+    }
+
+    private fun installTitleClickToggle() {
+        window.decorView.post {
+            val titleView = findTitleView(window.decorView, viewerTitle()) ?: return@post
+            titleView.isClickable = true
+            titleView.isFocusable = true
+            titleView.setOnClickListener {
+                toggleListPosition()
+            }
+        }
+    }
+
+    private fun toggleListPosition() {
+        val layoutManager = listLogs.layoutManager as? LinearLayoutManager ?: return
+        val firstCompletelyVisible = layoutManager.findFirstCompletelyVisibleItemPosition()
+        if (firstCompletelyVisible <= 0) {
+            scrollToBottom()
+        } else {
+            layoutManager.scrollToPositionWithOffset(0, 0)
+        }
+    }
+
+    private fun scrollToBottom() {
+        val layoutManager = listLogs.layoutManager as? LinearLayoutManager ?: return
+        if (!isViewingLocalFile()) {
+            val lastIndex = adapter.itemCount - 1
+            if (lastIndex >= 0) {
+                layoutManager.scrollToPositionWithOffset(lastIndex, 0)
+            }
+            return
+        }
+        val reader = localReader
+        if (reader == null || !reader.hasMore()) {
+            val lastIndex = adapter.itemCount - 1
+            if (lastIndex >= 0) {
+                layoutManager.scrollToPositionWithOffset(lastIndex, 0)
+            }
+            return
+        }
+        if (isLocalInitializing || isLocalLoadingMore) return
+        isLocalLoadingMore = true
+        thread {
+            val appended = ArrayList<LogEntry>()
+            while (reader.hasMore()) {
+                appended.addAll(reader.readNextPage())
+            }
+            runOnUiThread {
+                if (isFinishing || isDestroyed) return@runOnUiThread
+                isLocalLoadingMore = false
+                if (appended.isNotEmpty()) {
+                    localLoadedLogs.addAll(appended)
+                    allLogs = localLoadedLogs.toList()
+                    applyFilter()
+                }
+                val lastIndex = adapter.itemCount - 1
+                if (lastIndex >= 0) {
+                    layoutManager.scrollToPositionWithOffset(lastIndex, 0)
+                }
+            }
+        }
+    }
+
+    private fun findTitleView(view: View, titleText: String): TextView? {
+        if (view is TextView && view.text?.toString() == titleText) {
+            return view
+        }
+        if (view is ViewGroup) {
+            for (index in 0 until view.childCount) {
+                val matched = findTitleView(view.getChildAt(index), titleText)
+                if (matched != null) return matched
+            }
+        }
+        return null
+    }
+
+    private class VerticalSpaceItemDecoration(
+        private val spacePx: Int
+    ) : RecyclerView.ItemDecoration() {
+        override fun getItemOffsets(
+            outRect: Rect,
+            view: View,
+            parent: RecyclerView,
+            state: RecyclerView.State
+        ) {
+            val position = parent.getChildAdapterPosition(view)
+            if (position == RecyclerView.NO_POSITION) return
+            if (position > 0) {
+                outRect.top = spacePx
             }
         }
     }

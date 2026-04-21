@@ -1,8 +1,12 @@
 package com.v.log.inspector
 
 import java.io.File
+import java.io.RandomAccessFile
+import kotlin.math.max
 
 object LocalLogRepository {
+
+    private const val DEFAULT_PAGE_SIZE = 100
 
     fun listLogFiles(paths: List<String>?): List<LocalLogFile> {
         if (paths.isNullOrEmpty()) return emptyList()
@@ -27,6 +31,11 @@ object LocalLogRepository {
         return LocalLogParser.parse(file.readText(), file.lastModified())
     }
 
+    fun openPagedReader(file: File, pageSize: Int = DEFAULT_PAGE_SIZE): PagedReader? {
+        if (!file.exists() || !file.isFile) return null
+        return PagedReader(file, scanSegments(file), pageSize)
+    }
+
     fun deleteAll(files: List<LocalLogFile>): Int {
         var deletedCount = 0
         files.forEach { logFile ->
@@ -37,4 +46,61 @@ object LocalLogRepository {
         }
         return deletedCount
     }
+
+    private fun scanSegments(file: File): List<EntrySegment> {
+        val segments = ArrayList<EntrySegment>()
+        RandomAccessFile(file, "r").use { raf ->
+            var entryStart: Long? = null
+            while (true) {
+                val lineStart = raf.filePointer
+                val line = raf.readLine() ?: break
+                if (entryStart == null && LocalLogParser.isHeaderLine(line)) {
+                    entryStart = lineStart
+                    continue
+                }
+                if (entryStart != null && LocalLogParser.isSeparatorLine(line)) {
+                    segments.add(EntrySegment(entryStart, raf.filePointer))
+                    entryStart = null
+                }
+            }
+            if (entryStart != null && entryStart < raf.length()) {
+                segments.add(EntrySegment(entryStart, raf.length()))
+            }
+        }
+        return segments
+    }
+
+    class PagedReader internal constructor(
+        private val file: File,
+        private val segments: List<EntrySegment>,
+        private val pageSize: Int
+    ) {
+        private var nextIndexExclusive = segments.size
+
+        @Synchronized
+        fun hasMore(): Boolean = nextIndexExclusive > 0
+
+        @Synchronized
+        fun readNextPage(): List<LogEntry> {
+            if (nextIndexExclusive <= 0) return emptyList()
+            val fromIndex = max(0, nextIndexExclusive - pageSize)
+            val pageSegments = segments.subList(fromIndex, nextIndexExclusive).asReversed()
+            nextIndexExclusive = fromIndex
+            return RandomAccessFile(file, "r").use { raf ->
+                pageSegments.mapNotNull { segment ->
+                    raf.seek(segment.startOffset)
+                    val size = (segment.endOffset - segment.startOffset).toInt()
+                    if (size <= 0) return@mapNotNull null
+                    val bytes = ByteArray(size)
+                    raf.readFully(bytes)
+                    LocalLogParser.parseSingle(String(bytes, Charsets.UTF_8), file.lastModified())
+                }
+            }
+        }
+    }
+
+    internal data class EntrySegment(
+        val startOffset: Long,
+        val endOffset: Long
+    )
 }

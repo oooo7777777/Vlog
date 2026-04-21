@@ -1,23 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/action_more"
-        android:title="@string/vlog_menu_more"
-        android:icon="@android:drawable/ic_menu_more"
-        app:showAsAction="always">
-        <menu>
-            <item
-                android:id="@+id/action_local_files"
-                android:title="@string/vlog_local_files_title" />
-            <item
-                android:id="@+id/action_clear"
-                android:title="@string/vlog_clear" />
-            <item
-                android:id="@+id/action_share"
-                android:title="@string/vlog_share" />
-        </menu>
-    </item>
-
+        android:id="@+id/action_local_files"
+        android:title="@string/vlog_local_files_title"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_clear"
+        android:title="@string/vlog_clear"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_share"
+        android:title="@string/vlog_share"
+        android:showAsAction="never" />
+    <item
+        android:id="@+id/action_toggle_message_mode"
+        android:title="@string/vlog_show_full_mode"
+        android:showAsAction="never" />
 </menu>

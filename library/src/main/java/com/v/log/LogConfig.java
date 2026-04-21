@@ -62,6 +62,11 @@ public class LogConfig {
      */
     private Boolean enableLogInspector = false;
 
+    /**
+     * 日志列表预览长度
+     */
+    private int logInspectorPreviewLength = 120;
+
 
     public LogConfig(Context context) {
         mContext = context;
@@ -162,6 +167,15 @@ public class LogConfig {
 
     public LogConfig setEnableLogInspector(Boolean enableLogInspector) {
         this.enableLogInspector = enableLogInspector;
+        return this;
+    }
+
+    public int getLogInspectorPreviewLength() {
+        return logInspectorPreviewLength;
+    }
+
+    public LogConfig setLogInspectorPreviewLength(int logInspectorPreviewLength) {
+        this.logInspectorPreviewLength = logInspectorPreviewLength;
         return this;
     }
 }

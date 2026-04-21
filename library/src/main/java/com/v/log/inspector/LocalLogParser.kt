@@ -12,6 +12,10 @@ object LocalLogParser {
         "^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}\\.\\d{3}),(\\d+),([^,]*),(VERBOSE|DEBUG|INFO|WARN|ERROR|ASSERT),([^,]*)(?:,.*)?$"
     )
 
+    fun isHeaderLine(line: String): Boolean = headerRegex.matches(line)
+
+    fun isSeparatorLine(line: String): Boolean = line.startsWith(ENTRY_SEPARATOR_PREFIX)
+
     fun parse(content: String, fallbackTimestamp: Long): List<LogEntry> {
         if (content.isBlank()) return emptyList()
         val entries = ArrayList<LogEntry>()
@@ -51,6 +55,10 @@ object LocalLogParser {
         }
         flushEntry()
         return entries
+    }
+
+    fun parseSingle(content: String, fallbackTimestamp: Long): LogEntry? {
+        return parse(content, fallbackTimestamp).firstOrNull()
     }
 
     private fun parseHeader(line: String, fallbackTimestamp: Long): ParsedHeader? {

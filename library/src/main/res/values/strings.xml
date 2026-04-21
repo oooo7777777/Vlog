@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Log_core</string>
     <string name="vlog_viewer_title">VLog Inspector</string>
+    <string name="vlog_detail_title">Log Detail</string>
     <string name="vlog_notification_channel_name">VLog Inspector</string>
     <string name="vlog_notification_channel_desc">Show recent in-app logs</string>
     <string name="vlog_notification_title">VLog Inspector (%1$d)</string>
@@ -14,9 +15,15 @@
     <string name="vlog_clear">Clear</string>
     <string name="vlog_share">Share</string>
     <string name="vlog_copied">Copied</string>
+    <string name="vlog_copy">Copy</string>
     <string name="vlog_nothing_to_share">No logs to share</string>
     <string name="vlog_share_title">Share logs</string>
+    <string name="vlog_show_full_mode">Show full content</string>
+    <string name="vlog_show_preview_mode">Show preview content</string>
     <string name="vlog_menu_more">More</string>
+    <string name="vlog_label_tag">Tag</string>
+    <string name="vlog_label_thread">Thread</string>
+    <string name="vlog_label_message">Message</string>
     <string name="vlog_local_files_title">Local logs</string>
     <string name="vlog_local_files_empty">No local log files</string>
     <string name="vlog_local_files_delete_all">Delete all local logs</string>

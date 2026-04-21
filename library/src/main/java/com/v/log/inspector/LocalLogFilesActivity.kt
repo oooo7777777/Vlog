@@ -3,6 +3,7 @@ package com.v.log.inspector
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import android.widget.ListView
 import android.widget.TextView
@@ -28,8 +29,10 @@ class LocalLogFilesActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LogShareExporter.cleanupStaleFiles(this)
         setContentView(R.layout.vlog_activity_local_log_files)
         title = getString(R.string.vlog_local_files_title)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         tvSummary = findViewById(R.id.tvSummary)
         tvEmpty = findViewById(R.id.tvEmpty)
@@ -44,6 +47,17 @@ class LocalLogFilesActivity : AppCompatActivity() {
         btnDeleteAll.setOnClickListener { deleteAllLocalFiles() }
 
         render()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            android.R.id.home -> {
+                finish()
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onResume() {

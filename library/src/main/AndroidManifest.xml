@@ -4,6 +4,15 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application>
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.vlog.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/vlog_file_paths" />
+        </provider>
         <activity
             android:name=".inspector.LocalLogFilesActivity"
             android:exported="false"
@@ -13,6 +22,11 @@
             android:name=".inspector.LogViewerActivity"
             android:exported="false"
             android:label="@string/vlog_viewer_title"
+            android:theme="@style/VLogInspectorTheme" />
+        <activity
+            android:name=".inspector.LogDetailActivity"
+            android:exported="false"
+            android:label="@string/vlog_detail_title"
             android:theme="@style/VLogInspectorTheme" />
     </application>
 </manifest>

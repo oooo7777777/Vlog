@@ -6,19 +6,32 @@ import android.graphics.drawable.GradientDrawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.BaseAdapter
 import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
 import com.v.log.R
 import com.v.log.logger.Logger
+import java.util.HashMap
 
 class LogViewerAdapter(
     context: Context,
-    private val onClick: (LogEntry) -> Unit
-) : BaseAdapter() {
+    private val onClick: (LogEntry) -> Unit,
+    private val onLongClick: (LogEntry) -> Unit
+) : RecyclerView.Adapter<LogViewerAdapter.ViewHolder>() {
+
+    private companion object {
+        private val TITLE_COLOR = Color.parseColor("#18212F")
+        private val BODY_COLOR = Color.parseColor("#344054")
+        private val MUTED_COLOR = Color.parseColor("#667085")
+        private val THREAD_PILL_COLOR = Color.parseColor("#F2F4F7")
+        private val CARD_FILL_COLOR = Color.parseColor("#FCFCFD")
+    }
 
     private val inflater = LayoutInflater.from(context)
     private val density = context.resources.displayMetrics.density
     private val items = ArrayList<LogEntry>()
+    private val threadBackground = pillDrawable(THREAD_PILL_COLOR)
+    private val cardBackgrounds = HashMap<Int, GradientDrawable>()
+    private var showFullMessage = false
 
     fun submit(entries: List<LogEntry>) {
         items.clear()
@@ -26,49 +39,61 @@ class LogViewerAdapter(
         notifyDataSetChanged()
     }
 
+    fun setShowFullMessage(show: Boolean) {
+        if (showFullMessage == show) return
+        showFullMessage = show
+        notifyDataSetChanged()
+    }
+
     fun currentItems(): List<LogEntry> = items.toList()
 
-    override fun getCount(): Int = items.size
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = inflater.inflate(R.layout.vlog_item_log_entry, parent, false)
+        return ViewHolder(view)
+    }
 
-    override fun getItem(position: Int): LogEntry = items[position]
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val entry = items[position]
+        holder.bind(entry)
+    }
 
-    override fun getItemId(position: Int): Long = position.toLong()
+    override fun getItemCount(): Int = items.size
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val view = convertView ?: inflater.inflate(R.layout.vlog_item_log_entry, parent, false)
-        val entry = getItem(position)
-        val accentColor = levelColor(entry.level)
-        val titleColor = Color.parseColor("#18212F")
-        val bodyColor = Color.parseColor("#344054")
-        val mutedColor = Color.parseColor("#667085")
-        val chipTextColor = darken(accentColor, 0.18f)
-        val chipBackgroundColor = mixWithWhite(accentColor, 0.86f)
+    inner class ViewHolder(root: View) : RecyclerView.ViewHolder(root) {
+        private val logCard: View = root.findViewById(R.id.logCard)
+        private val tvTime: TextView = root.findViewById(R.id.tvTime)
+        private val tvTag: TextView = root.findViewById(R.id.tvTag)
+        private val tvThread: TextView = root.findViewById(R.id.tvThread)
+        private val tvMessage: TextView = root.findViewById(R.id.tvMessage)
 
-        view.findViewById<View>(R.id.logCard).background = outlinedCardDrawable(accentColor)
-        view.findViewById<TextView>(R.id.tvLevel).apply {
-            text = entry.levelName
-            setTextColor(chipTextColor)
-            background = pillDrawable(chipBackgroundColor)
+        fun bind(entry: LogEntry) {
+            val accentColor = levelColor(entry.level)
+            logCard.background = cardBackgrounds.getOrPut(entry.level) {
+                outlinedCardDrawable(accentColor)
+            }
+            tvTime.apply {
+                text = LogInspectorStore.formatTime(entry.timestamp)
+                setTextColor(MUTED_COLOR)
+            }
+            tvTag.apply {
+                text = entry.tag
+                setTextColor(TITLE_COLOR)
+            }
+            tvThread.apply {
+                text = "Thread: ${entry.thread}"
+                setTextColor(MUTED_COLOR)
+                background = threadBackground
+            }
+            tvMessage.apply {
+                text = displayMessage(entry)
+                setTextColor(BODY_COLOR)
+            }
+            itemView.setOnClickListener { onClick(entry) }
+            itemView.setOnLongClickListener {
+                onLongClick(entry)
+                true
+            }
         }
-        view.findViewById<TextView>(R.id.tvTime).apply {
-            text = LogInspectorStore.formatTime(entry.timestamp)
-            setTextColor(mutedColor)
-        }
-        view.findViewById<TextView>(R.id.tvTag).apply {
-            text = entry.tag
-            setTextColor(titleColor)
-        }
-        view.findViewById<TextView>(R.id.tvThread).apply {
-            text = "Thread: ${entry.thread}"
-            setTextColor(mutedColor)
-            background = pillDrawable(Color.parseColor("#F2F4F7"))
-        }
-        view.findViewById<TextView>(R.id.tvMessage).apply {
-            text = entry.message
-            setTextColor(bodyColor)
-        }
-        view.setOnClickListener { onClick(entry) }
-        return view
     }
 
     private fun levelColor(level: Int): Int {
@@ -93,9 +118,13 @@ class LogViewerAdapter(
         return GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             cornerRadius = 18f * density
-            setColor(Color.parseColor("#FCFCFD"))
+            setColor(CARD_FILL_COLOR)
             setStroke((1.2f * density).toInt().coerceAtLeast(1), mixWithWhite(strokeColor, 0.28f))
         }
+    }
+
+    private fun displayMessage(entry: LogEntry): String {
+        return if (showFullMessage) entry.message else LogInspectorStore.previewMessage(entry.message)
     }
 
     private fun mixWithWhite(color: Int, whiteRatio: Float): Int {
@@ -104,14 +133,5 @@ class LogViewerAdapter(
         val green = (Color.green(color) * (1 - ratio) + 255 * ratio).toInt()
         val blue = (Color.blue(color) * (1 - ratio) + 255 * ratio).toInt()
         return Color.rgb(red, green, blue)
-    }
-
-    private fun darken(color: Int, ratio: Float): Int {
-        val factor = (1f - ratio.coerceIn(0f, 1f))
-        return Color.rgb(
-            (Color.red(color) * factor).toInt(),
-            (Color.green(color) * factor).toInt(),
-            (Color.blue(color) * factor).toInt()
-        )
     }
 }

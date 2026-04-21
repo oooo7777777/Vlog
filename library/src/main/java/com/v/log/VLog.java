@@ -46,6 +46,7 @@ public final class VLog {
         configCenter.setShowDetailedLog(logConfig.getShowDetailedLog());
         configCenter.setBeautifyLog(logConfig.getBeautifyLog());
         LogInspectorStore.INSTANCE.setEnabled(Boolean.TRUE.equals(logConfig.getEnableLogInspector()));
+        LogInspectorStore.INSTANCE.setPreviewLength(logConfig.getLogInspectorPreviewLength());
         LogInspectorNotifier.INSTANCE.setup(applicationContext, Boolean.TRUE.equals(logConfig.getEnableLogInspector()));
 
         try {

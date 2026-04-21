@@ -10,11 +10,14 @@ object LogInspectorStore {
 
     private const val MAX_ENTRIES = 500
     private const val MAX_MESSAGE_LENGTH = 16 * 1024
+    private const val DEFAULT_PREVIEW_LENGTH = 120
     private val timeFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.CHINA)
     private val entries = ArrayList<LogEntry>(MAX_ENTRIES)
     private val listeners = CopyOnWriteArraySet<() -> Unit>()
     @Volatile
     private var enabled = false
+    @Volatile
+    private var previewLength = DEFAULT_PREVIEW_LENGTH
 
     @Synchronized
     fun setEnabled(enable: Boolean) {
@@ -26,6 +29,12 @@ object LogInspectorStore {
     }
 
     fun isEnabled(): Boolean = enabled
+
+    fun setPreviewLength(length: Int) {
+        previewLength = length.coerceAtLeast(40)
+    }
+
+    fun getPreviewLength(): Int = previewLength
 
     @Synchronized
     fun add(priority: Int, tag: String, thread: String, message: String) {
@@ -64,6 +73,11 @@ object LogInspectorStore {
     }
 
     fun formatTime(timestamp: Long): String = timeFormat.format(Date(timestamp))
+
+    fun previewMessage(message: String): String {
+        if (message.length <= previewLength) return message
+        return message.take(previewLength).trimEnd() + "..."
+    }
 
     private fun clipMessage(message: String): String {
         if (message.length <= MAX_MESSAGE_LENGTH) return message

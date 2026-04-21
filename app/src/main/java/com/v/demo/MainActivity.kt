@@ -18,6 +18,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
+
+    companion object {
+        const val EXTRA_SEED_TEST_LOGS = "extra_seed_test_logs"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,6 +37,12 @@ class MainActivity : AppCompatActivity() {
         //把日志文件打包成zip 并且返回zip地址
         CoroutineScope(Dispatchers.IO).launch {
             "ZIP 文件路径为${ZipUtils.zip(this@MainActivity)}".log()
+        }
+
+        if (intent.getBooleanExtra(EXTRA_SEED_TEST_LOGS, false)) {
+            CoroutineScope(Dispatchers.IO).launch {
+                generateTestLogs(500)
+            }
         }
 
     }
@@ -57,5 +68,11 @@ class MainActivity : AppCompatActivity() {
         VLog.openLogViewer(this)
     }
 
+    private fun generateTestLogs(count: Int) {
+        repeat(count) { index ->
+            "test${index + 1}".logD()
+        }
+        VLog.flush()
+    }
 
 }
