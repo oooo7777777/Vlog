@@ -15,7 +15,7 @@ afterEvaluate {
                 from components.release
                 groupId = 'com.v.log'
                 artifactId = 'vlog'
-                version = '2.0.5-SNAPSHOT'
+                version = '2.0.6'
             }
         }
     }
