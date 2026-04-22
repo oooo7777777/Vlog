@@ -17,16 +17,22 @@
             android:name=".inspector.LocalLogFilesActivity"
             android:exported="false"
             android:label="@string/vlog_local_files_title"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.vlog.inspector"
             android:theme="@style/VLogInspectorTheme" />
         <activity
             android:name=".inspector.LogViewerActivity"
             android:exported="false"
             android:label="@string/vlog_viewer_title"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.vlog.inspector"
             android:theme="@style/VLogInspectorTheme" />
         <activity
             android:name=".inspector.LogDetailActivity"
             android:exported="false"
             android:label="@string/vlog_detail_title"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}.vlog.inspector"
             android:theme="@style/VLogInspectorTheme" />
     </application>
 </manifest>
