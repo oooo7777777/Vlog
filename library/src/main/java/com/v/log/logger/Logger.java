@@ -7,16 +7,22 @@ import java.util.List;
 
 public interface Logger {
 
+    public static final int VERBOSE = 2;
     public static final int DEBUG = 3;
     public static final int INFO = 4;
     public static final int WARN = 5;
     public static final int ERROR = 6;
+    public static final int ASSERT = 7;
+
+    void v(String tag, Boolean save, String message);
 
     void d(String tag, Boolean save, String message);
 
     void e(String tag, Boolean save, String message);
 
     void w(String tag, Boolean save, String message);
+
+    void a(String tag, Boolean save, String message);
 
     void i(String tag, Boolean save, Boolean show, String message);
 

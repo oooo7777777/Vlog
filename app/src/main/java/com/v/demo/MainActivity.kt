@@ -8,10 +8,12 @@ import com.v.log.LogConfig
 import com.v.log.VLog
 import com.v.log.util.ZipUtils
 import com.v.log.util.log
+import com.v.log.util.logA
 import com.v.log.util.logD
 import com.v.log.util.logE
 import com.v.log.util.logI
 import com.v.log.util.logSave
+import com.v.log.util.logV
 import com.v.log.util.logW
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -49,16 +51,17 @@ class MainActivity : AppCompatActivity() {
 
     fun writeFile(view: View?) {
 
-        "logD".logD()
-        Throwable("测试").logE()
-        "错误".logE()
-        "logE".logE("hahhahha")
-        "logW".logW()
-        "logI".logI()
-        "只打印3333333333".log()
-        "只保存444444444444".logSave()
+        "logDlogDlogD".logD()
+        Throwable("测试ThrowableThrowableThrowable").logE()
+        "logElogElogE".logE()
+        "logElogElogE".logE("hahhahha")
+        "logWlogWlogW".logW()
+        "logIlogIlogI".logI()
+        "只打印logloglog".log()
+        "只保存logSavelogSave".logSave()
         "order created".logD(tag = "Order")
-        "order paid".logD(tag = "Order")
+        "logAlogAlogA".logA()
+        "logVlogVlogV".logV()
 
     }
 

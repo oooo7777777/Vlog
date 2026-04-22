@@ -87,6 +87,10 @@ public final class VLog {
         sLogger.d(tag, save, message);
     }
 
+    public static void v(String tag, Boolean save, String message) {
+        sLogger.v(tag, save, message);
+    }
+
 
     public static void e(String tag, Boolean save, String message) {
         sLogger.e(tag, save, message);
@@ -99,6 +103,10 @@ public final class VLog {
 
     public static void w(String tag, Boolean save, String message) {
         sLogger.w(tag, save, message);
+    }
+
+    public static void a(String tag, Boolean save, String message) {
+        sLogger.a(tag, save, message);
     }
 
     /**

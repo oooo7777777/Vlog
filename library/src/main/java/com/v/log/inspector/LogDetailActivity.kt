@@ -108,10 +108,12 @@ class LogDetailActivity : AppCompatActivity() {
 
     private fun levelBorderColor(level: Int): Int {
         val accent = when (level) {
+            Logger.VERBOSE -> Color.parseColor("#6D28D9")
             Logger.DEBUG -> Color.parseColor("#1565C0")
             Logger.INFO -> Color.parseColor("#2E7D32")
             Logger.WARN -> Color.parseColor("#EF6C00")
             Logger.ERROR -> Color.parseColor("#C62828")
+            Logger.ASSERT -> Color.parseColor("#111827")
             else -> Color.parseColor("#546E7A")
         }
         return mixWithWhite(accent, 0.28f)

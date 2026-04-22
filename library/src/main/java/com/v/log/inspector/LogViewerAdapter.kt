@@ -93,10 +93,12 @@ class LogViewerAdapter(
 
     private fun levelColor(level: Int): Int {
         return when (level) {
+            Logger.VERBOSE -> Color.parseColor("#6D28D9")
             Logger.DEBUG -> Color.parseColor("#1565C0")
             Logger.INFO -> Color.parseColor("#2E7D32")
             Logger.WARN -> Color.parseColor("#EF6C00")
             Logger.ERROR -> Color.parseColor("#C62828")
+            Logger.ASSERT -> Color.parseColor("#111827")
             else -> Color.parseColor("#546E7A")
         }
     }

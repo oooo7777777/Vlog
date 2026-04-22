@@ -97,19 +97,23 @@ class LogViewerActivity : AppCompatActivity() {
             android.R.layout.simple_spinner_dropdown_item,
             listOf(
                 getString(R.string.vlog_level_all),
+                getString(R.string.vlog_level_verbose),
                 getString(R.string.vlog_level_debug),
                 getString(R.string.vlog_level_info),
                 getString(R.string.vlog_level_warn),
-                getString(R.string.vlog_level_error)
+                getString(R.string.vlog_level_error),
+                getString(R.string.vlog_level_assert)
             )
         )
         spinnerLevel.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
                 selectedLevel = when (position) {
-                    1 -> Logger.DEBUG
-                    2 -> Logger.INFO
-                    3 -> Logger.WARN
-                    4 -> Logger.ERROR
+                    1 -> Logger.VERBOSE
+                    2 -> Logger.DEBUG
+                    3 -> Logger.INFO
+                    4 -> Logger.WARN
+                    5 -> Logger.ERROR
+                    6 -> Logger.ASSERT
                     else -> null
                 }
                 applyFilter()

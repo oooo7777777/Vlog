@@ -14,6 +14,15 @@ fun Any.logD(tag: String = TAG, save: Boolean = true) = run {
     )
 }
 
+@JvmOverloads
+fun Any.logV(tag: String = TAG, save: Boolean = true) = run {
+    this.showLog(
+        tag = tag,
+        level = Log.VERBOSE,
+        saveLog = save
+    )
+}
+
 /**
  * 此方法会打印日志不会保存日志
  */
@@ -72,6 +81,15 @@ fun Any.logE(tag: String = TAG, save: Boolean = true) = run {
     )
 }
 
+@JvmOverloads
+fun Any.logA(tag: String = TAG, save: Boolean = true) = run {
+    this.showLog(
+        tag = tag,
+        level = Log.ASSERT,
+        saveLog = save
+    )
+}
+
 private fun Any.showLog(
     tag: String = TAG,
     level: Int = Log.INFO,
@@ -85,6 +103,14 @@ private fun Any.showLog(
     }
 
     when (level) {
+        Log.VERBOSE -> {
+            VLog.v(
+                tag,
+                saveLog,
+                msg
+            )
+        }
+
         Log.DEBUG -> {
             VLog.d(
                 tag,
@@ -103,6 +129,14 @@ private fun Any.showLog(
 
         Log.ERROR -> {
             VLog.e(
+                tag,
+                saveLog,
+                msg
+            )
+        }
+
+        Log.ASSERT -> {
+            VLog.a(
                 tag,
                 saveLog,
                 msg

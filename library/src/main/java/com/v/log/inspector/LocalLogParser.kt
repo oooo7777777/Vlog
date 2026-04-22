@@ -78,12 +78,12 @@ object LocalLogParser {
 
     private fun mapLevel(levelName: String): Int {
         return when (levelName) {
+            "VERBOSE" -> Logger.VERBOSE
             "DEBUG" -> Logger.DEBUG
             "INFO" -> Logger.INFO
             "WARN" -> Logger.WARN
             "ERROR" -> Logger.ERROR
-            "VERBOSE" -> Logger.DEBUG
-            "ASSERT" -> Logger.ERROR
+            "ASSERT" -> Logger.ASSERT
             else -> Logger.INFO
         }
     }

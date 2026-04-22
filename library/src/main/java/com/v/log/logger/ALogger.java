@@ -22,6 +22,11 @@ public class ALogger implements Logger {
     }
 
     @Override
+    public void v(String tag, Boolean save, String message) {
+        log(VERBOSE, null, tag, save, true, message);
+    }
+
+    @Override
     public void d(String tag, Boolean save, String message) {
         log(DEBUG, null, tag, save, true, message);
     }
@@ -34,6 +39,11 @@ public class ALogger implements Logger {
     @Override
     public void w(String tag, Boolean save, String message) {
         log(WARN, null, tag, save, true, message);
+    }
+
+    @Override
+    public void a(String tag, Boolean save, String message) {
+        log(ASSERT, null, tag, save, true, message);
     }
 
     @Override

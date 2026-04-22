@@ -8,10 +8,12 @@
     <string name="vlog_notification_empty">Tap to open log viewer</string>
     <string name="vlog_filter_hint">Filter by tag or time</string>
     <string name="vlog_level_all">All</string>
+    <string name="vlog_level_verbose">VERBOSE</string>
     <string name="vlog_level_debug">DEBUG</string>
     <string name="vlog_level_info">INFO</string>
     <string name="vlog_level_warn">WARN</string>
     <string name="vlog_level_error">ERROR</string>
+    <string name="vlog_level_assert">ASSERT</string>
     <string name="vlog_clear">Clear</string>
     <string name="vlog_share">Share</string>
     <string name="vlog_copied">Copied</string>
