@@ -113,3 +113,4 @@ fi
 git push origin "$BRANCH"
 
 wait_for_jitpack "${BRANCH}-SNAPSHOT"
+echo "Dependency: com.github.${OWNER}:${REPO}:${BRANCH}-SNAPSHOT"

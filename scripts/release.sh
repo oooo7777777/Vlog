@@ -115,3 +115,4 @@ git push origin "$VERSION"
 
 echo "Release $VERSION pushed."
 wait_for_jitpack "$VERSION"
+echo "Dependency: com.github.${OWNER}:${REPO}:${VERSION}"
