@@ -1,0 +1,25 @@
+name: Warm JitPack
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  warm:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Warm JitPack build
+        env:
+          TAG_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          JITPACK_URL="https://jitpack.io/com/github/oooo7777777/Vlog/${TAG_NAME}/Vlog-${TAG_NAME}.pom"
+          echo "Requesting ${JITPACK_URL}"
+          curl --fail --location --retry 5 --retry-all-errors --silent --show-error "$JITPACK_URL" >/tmp/jitpack-pom.xml || {
+            echo "Primary artifact request failed, fetching build log for diagnostics"
+            curl --location --retry 5 --retry-all-errors --silent --show-error \
+              "https://jitpack.io/com/github/oooo7777777/Vlog/${TAG_NAME}/build.log" || true
+            exit 1
+          }
+          echo "JitPack warm request completed for ${TAG_NAME}"

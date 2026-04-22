@@ -54,7 +54,7 @@ sdcard/Android/data/
 
    ```groovy
    dependencies {
-   	        implementation 'com.github.oooo7777777:Vlog:2.0.0'
+   	        implementation 'com.github.oooo7777777:Vlog:2.0.6'
    	}
    ```
 
@@ -100,4 +100,20 @@ LogExtKt.log("hello VLog");
 VLog.flush();
 ```
 
+## 发布流程
+
+推荐使用仓库里的脚本一键发布：
+
+```bash
+./scripts/release.sh 2.0.7
+```
+
+这个脚本会自动完成：
+
+1. 更新 `gradle.properties` 里的 `VLOG_VERSION`
+2. 同步更新 README 里的依赖版本
+3. 提交发布 commit
+4. 创建并推送对应 git tag
+
+仓库里的 GitHub Actions 会在 tag push 后自动请求一次 JitPack，对新版本做预热，不需要再手动打开 JitPack 页面点击 `Get it`。
 
