@@ -29,6 +29,11 @@ if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+){1,2}([-.][A-Za-z0-9]+)?$ ]]; then
   exit 1
 fi
 
+if [[ "$VERSION" == *-SNAPSHOT ]]; then
+  echo "Snapshot versions should use ./scripts/snapshot.sh instead of release.sh"
+  exit 1
+fi
+
 cd "$ROOT_DIR"
 
 DIRTY_FILES=()

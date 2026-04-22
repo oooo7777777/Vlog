@@ -117,3 +117,28 @@ VLog.flush();
 
 仓库里的 GitHub Actions 会在 tag push 后自动请求一次 JitPack，对新版本做预热，不需要再手动打开 JitPack 页面点击 `Get it`。
 
+如果是快照版本，不要使用 `release.sh`。请改用：
+
+```bash
+./scripts/snapshot.sh 2.0.7-SNAPSHOT
+```
+
+或者先在 `gradle.properties` 里写好 `VLOG_VERSION=2.0.7-SNAPSHOT`，然后直接执行：
+
+```bash
+./scripts/snapshot.sh
+```
+
+快照发布不会创建 git tag，而是：
+
+1. 提交当前快照元数据
+2. 推送当前分支
+3. 预热 JitPack 的 `当前分支-SNAPSHOT`
+
+接入方依赖时请使用：
+
+```groovy
+implementation 'com.github.oooo7777777:Vlog:master-SNAPSHOT'
+```
+
+如果你在其他分支发布快照，就把 `master` 替换成对应分支名。分支名里如果有 `/`，JitPack 需要把它写成 `~`。
