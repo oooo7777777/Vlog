@@ -24,12 +24,13 @@ object LocalLogParser {
 
         fun flushEntry() {
             val header = currentHeader ?: return
+            val displayTag = LogInspectorStore.sanitizeDisplayTag(header.tag)
             entries.add(
                 LogEntry(
                     timestamp = header.timestamp,
                     level = header.level,
                     levelName = header.levelName,
-                    tag = header.tag,
+                    tag = displayTag,
                     thread = header.thread,
                     message = messageLines.joinToString("\n").trimEnd()
                 )

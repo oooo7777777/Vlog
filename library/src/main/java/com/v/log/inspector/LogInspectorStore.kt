@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArraySet
 
 object LogInspectorStore {
 
+    const val TAB_V_LOG = "V_LOG"
     private const val MAX_ENTRIES = 500
     private const val MAX_MESSAGE_LENGTH = 16 * 1024
     private const val DEFAULT_PREVIEW_LENGTH = 120
@@ -36,18 +37,33 @@ object LogInspectorStore {
 
     fun getPreviewLength(): Int = previewLength
 
+    fun buildTabs(entries: List<LogEntry>): List<LogTabItem> {
+        val tabs = ArrayList<LogTabItem>()
+        tabs.add(LogTabItem(TAB_V_LOG, TAB_V_LOG))
+        val customTabs = LinkedHashSet<String>()
+        entries.forEach { entry ->
+            val custom = entry.tag.takeIf { it.isNotBlank() } ?: return@forEach
+            if (custom != TAB_V_LOG) {
+                customTabs.add(custom)
+            }
+        }
+        customTabs.forEach { tabs.add(LogTabItem(it, it)) }
+        return tabs
+    }
+
     @Synchronized
     fun add(priority: Int, tag: String, thread: String, message: String) {
         if (!enabled) return
         if (entries.size >= MAX_ENTRIES) {
             entries.removeAt(0)
         }
+        val sanitizedTag = sanitizeTag(tag)
         entries.add(
             LogEntry(
                 timestamp = System.currentTimeMillis(),
                 level = priority,
                 levelName = LogUtils.logLevel(priority),
-                tag = sanitizeTag(tag),
+                tag = sanitizedTag,
                 thread = thread,
                 message = clipMessage(message)
             )
@@ -79,6 +95,8 @@ object LogInspectorStore {
         return message.take(previewLength).trimEnd() + "..."
     }
 
+    fun sanitizeDisplayTag(tag: String): String = sanitizeTag(tag)
+
     private fun clipMessage(message: String): String {
         if (message.length <= MAX_MESSAGE_LENGTH) return message
         val remain = message.length - MAX_MESSAGE_LENGTH
@@ -98,4 +116,9 @@ object LogInspectorStore {
     private fun dispatchChanged() {
         listeners.forEach { it.invoke() }
     }
+
+    data class LogTabItem(
+        val key: String,
+        val label: String
+    )
 }

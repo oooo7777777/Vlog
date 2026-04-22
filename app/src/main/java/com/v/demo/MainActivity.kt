@@ -57,6 +57,8 @@ class MainActivity : AppCompatActivity() {
         "logI".logI()
         "只打印3333333333".log()
         "只保存444444444444".logSave()
+        "order created".logD(tag = "Order")
+        "order paid".logD(tag = "Order")
 
     }
 

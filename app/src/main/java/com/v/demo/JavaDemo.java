@@ -10,10 +10,10 @@ import com.v.log.util.LogExtKt;
 public class JavaDemo {
     public void test() {
         LogExtKt.log("java~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        LogExtKt.logD("logD");
+        LogExtKt.logD("logD", "V_LOG", true);
         LogExtKt.logE(new Throwable("测试"));
-        LogExtKt.logW("logW");
-        LogExtKt.logI("logI");
+        LogExtKt.logW("logW", "V_LOG", true);
+        LogExtKt.logI("logI", "V_LOG", true);
         LogExtKt.log("只打印3333333333");
         LogExtKt.logSave("只保存444444444444");
 

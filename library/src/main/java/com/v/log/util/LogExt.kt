@@ -5,28 +5,14 @@ import com.v.log.VLog
 
 const val TAG = "V_LOG"
 
-fun Any.logD() = run {
-    this.showLog(
-        TAG,
-        Log.DEBUG
-    )
-}
-
-fun Any.logD(tag: String = TAG) = run {
-    this.showLog(
-        tag,
-        Log.DEBUG
-    )
-}
-
+@JvmOverloads
 fun Any.logD(tag: String = TAG, save: Boolean = true) = run {
     this.showLog(
-        tag,
-        Log.DEBUG,
-        save
+        tag = tag,
+        level = Log.DEBUG,
+        saveLog = save
     )
 }
-
 
 /**
  * 此方法会打印日志不会保存日志
@@ -59,73 +45,30 @@ fun Any.logSave() = run {
     )
 }
 
-
-fun Any.logI() = run {
-    this.showLog(
-        TAG,
-        Log.INFO
-    )
-}
-
-fun Any.logI(tag: String = TAG) = run {
-    this.showLog(
-        tag,
-        Log.INFO
-    )
-}
-
+@JvmOverloads
 fun Any.logI(tag: String = TAG, save: Boolean = true) = run {
     this.showLog(
-        tag,
-        Log.INFO,
-        save
+        tag = tag,
+        level = Log.INFO,
+        saveLog = save
     )
 }
 
-
-fun Any.logW() = run {
-    this.showLog(
-        TAG,
-        Log.WARN
-    )
-}
-
-fun Any.logW(tag: String = TAG) = run {
-    this.showLog(
-        tag,
-        Log.WARN
-    )
-}
-
+@JvmOverloads
 fun Any.logW(tag: String = TAG, save: Boolean = true) = run {
     this.showLog(
-        tag,
-        Log.WARN,
-        save
+        tag = tag,
+        level = Log.WARN,
+        saveLog = save
     )
 }
 
-
-fun Any.logE() = run {
-    this.showLog(
-        TAG,
-        Log.ERROR
-
-    )
-}
-
-fun Any.logE(tag: String = TAG) = run {
-    this.showLog(
-        tag,
-        Log.ERROR
-    )
-}
-
+@JvmOverloads
 fun Any.logE(tag: String = TAG, save: Boolean = true) = run {
     this.showLog(
-        tag,
-        Log.ERROR,
-        save
+        tag = tag,
+        level = Log.ERROR,
+        saveLog = save
     )
 }
 
@@ -176,6 +119,4 @@ private fun Any.showLog(
         }
 
     }
-
 }
-

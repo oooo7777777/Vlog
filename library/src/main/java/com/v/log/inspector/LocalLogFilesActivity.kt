@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.TextView
 import android.widget.Toast
@@ -43,6 +44,10 @@ class LocalLogFilesActivity : AppCompatActivity() {
             startActivity(LogViewerActivity.createIntent(this, file.absolutePath))
         }
         listLogs.adapter = adapter
+        listLogs.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
+            val file = adapter.getItem(position)
+            startActivity(LogViewerActivity.createIntent(this, file.absolutePath))
+        }
 
         btnDeleteAll.setOnClickListener { deleteAllLocalFiles() }
 

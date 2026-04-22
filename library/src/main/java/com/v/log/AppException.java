@@ -45,7 +45,7 @@ public class AppException implements Thread.UncaughtExceptionHandler {
 
         try {
             // 记录异常信息
-            LogExtKt.logE(Log.getStackTraceString(exception),"AppException");
+            LogExtKt.logE(Log.getStackTraceString(exception), "AppException", true);
         } catch (Exception e) {
             // 处理日志记录中的任何异常，避免递归调用
             e.printStackTrace();

@@ -4,6 +4,8 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.graphics.Rect
 import android.os.Bundle
 import android.text.Editable
@@ -12,6 +14,8 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ArrayAdapter
 import android.widget.AdapterView
+import android.widget.HorizontalScrollView
+import android.widget.LinearLayout
 import android.widget.Spinner
 import android.view.Menu
 import android.view.MenuItem
@@ -44,9 +48,12 @@ class LogViewerActivity : AppCompatActivity() {
     private lateinit var adapter: LogViewerAdapter
     private lateinit var etFilter: EditText
     private lateinit var spinnerLevel: Spinner
+    private lateinit var scrollTabs: HorizontalScrollView
+    private lateinit var layoutTabs: LinearLayout
     private lateinit var listLogs: RecyclerView
     private var allLogs: List<LogEntry> = emptyList()
     private var selectedLevel: Int? = null
+    private var selectedTabKey: String = LogInspectorStore.TAB_V_LOG
     private var localLogFilePath: String? = null
     private var showFullMessage = false
     private var localReader: LocalLogRepository.PagedReader? = null
@@ -60,13 +67,13 @@ class LogViewerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         LogShareExporter.cleanupStaleFiles(this)
         setContentView(R.layout.vlog_activity_log_viewer)
-        localLogFilePath = intent.getStringExtra(EXTRA_LOCAL_LOG_FILE_PATH)
-        title = viewerTitle()
-        supportActionBar?.setDisplayHomeAsUpEnabled(isViewingLocalFile())
+        applyIntentState(intent)
         installTitleClickToggle()
 
         etFilter = findViewById(R.id.etFilter)
         spinnerLevel = findViewById(R.id.spinnerLevel)
+        scrollTabs = findViewById(R.id.scrollTabs)
+        layoutTabs = findViewById(R.id.layoutTabs)
         listLogs = findViewById(R.id.listLogs)
         etFilter.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
@@ -134,6 +141,15 @@ class LogViewerActivity : AppCompatActivity() {
             }
         })
 
+        render()
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        if (intent == null) return
+        setIntent(intent)
+        applyIntentState(intent)
+        invalidateOptionsMenu()
         render()
     }
 
@@ -209,6 +225,11 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private fun applyFilter() {
+        val availableTabs = LogInspectorStore.buildTabs(allLogs)
+        if (availableTabs.none { it.key == selectedTabKey }) {
+            selectedTabKey = LogInspectorStore.TAB_V_LOG
+        }
+        renderTabs(availableTabs)
         val keyword = etFilter.text.toString().trim()
         val logs = allLogs.filter { entry ->
             val timeText = LogInspectorStore.formatTime(entry.timestamp)
@@ -218,7 +239,11 @@ class LogViewerActivity : AppCompatActivity() {
                     timeText.contains(keyword, ignoreCase = true) ||
                     entry.message.contains(keyword, ignoreCase = true)
             val levelMatched = selectedLevel == null || entry.level == selectedLevel
-            keywordMatched && levelMatched
+            val tabMatched = when (selectedTabKey) {
+                LogInspectorStore.TAB_V_LOG -> true
+                else -> entry.tag == selectedTabKey
+            }
+            keywordMatched && levelMatched && tabMatched
         }
         adapter.submit(logs)
     }
@@ -250,6 +275,12 @@ class LogViewerActivity : AppCompatActivity() {
 
     private fun isViewingLocalFile(): Boolean = !localLogFilePath.isNullOrEmpty()
 
+    private fun applyIntentState(intent: Intent) {
+        localLogFilePath = intent.getStringExtra(EXTRA_LOCAL_LOG_FILE_PATH)
+        title = viewerTitle()
+        supportActionBar?.setDisplayHomeAsUpEnabled(isViewingLocalFile())
+    }
+
     private fun viewerTitle(): String {
         val localFileName = localLogFilePath?.let { File(it).name }
         return if (localFileName.isNullOrEmpty()) {
@@ -268,8 +299,12 @@ class LogViewerActivity : AppCompatActivity() {
         allLogs = emptyList()
         isLocalInitializing = true
         thread {
-            val reader = LocalLogRepository.openPagedReader(File(path), LOCAL_PAGE_SIZE)
-            val entries = reader?.readNextPage().orEmpty()
+            val logFile = File(path)
+            val reader = LocalLogRepository.openPagedReader(logFile, LOCAL_PAGE_SIZE)
+            var entries = reader?.readNextPage().orEmpty()
+            if (entries.isEmpty() && logFile.length() > 0L) {
+                entries = LocalLogRepository.readEntries(logFile).asReversed()
+            }
             val hasMore = reader?.hasMore() == true
             runOnUiThread {
                 if (isFinishing || isDestroyed) return@runOnUiThread
@@ -307,6 +342,54 @@ class LogViewerActivity : AppCompatActivity() {
                 localLoadedLogs.addAll(nextEntries)
                 allLogs = localLoadedLogs.toList()
                 applyFilter()
+            }
+        }
+    }
+
+    private fun renderTabs(tabs: List<LogInspectorStore.LogTabItem>) {
+        layoutTabs.removeAllViews()
+        val marginEnd = (8 * resources.displayMetrics.density).toInt()
+        tabs.forEach { tab ->
+            val tabView = TextView(this).apply {
+                text = tab.label
+                textSize = 13f
+                setPadding(
+                    (16 * resources.displayMetrics.density).toInt(),
+                    (8 * resources.displayMetrics.density).toInt(),
+                    (16 * resources.displayMetrics.density).toInt(),
+                    (8 * resources.displayMetrics.density).toInt()
+                )
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+                ).apply {
+                    this.marginEnd = marginEnd
+                }
+                background = tabBackground(selected = tab.key == selectedTabKey)
+                setTextColor(if (tab.key == selectedTabKey) Color.parseColor("#FFFFFF") else Color.parseColor("#344054"))
+                setOnClickListener {
+                    if (selectedTabKey == tab.key) return@setOnClickListener
+                    selectedTabKey = tab.key
+                    applyFilter()
+                }
+            }
+            layoutTabs.addView(tabView)
+        }
+        scrollTabs.visibility = if (tabs.isEmpty()) View.GONE else View.VISIBLE
+    }
+
+    private fun tabBackground(selected: Boolean): GradientDrawable {
+        return GradientDrawable().apply {
+            shape = GradientDrawable.RECTANGLE
+            cornerRadius = 999f * resources.displayMetrics.density
+            if (selected) {
+                setColor(Color.parseColor("#18212F"))
+            } else {
+                setColor(Color.parseColor("#FFFFFF"))
+                setStroke(
+                    (1 * resources.displayMetrics.density).toInt().coerceAtLeast(1),
+                    Color.parseColor("#D0D5DD")
+                )
             }
         }
     }

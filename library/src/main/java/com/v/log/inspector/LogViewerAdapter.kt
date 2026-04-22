@@ -10,7 +10,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.v.log.R
 import com.v.log.logger.Logger
-import java.util.HashMap
 
 class LogViewerAdapter(
     context: Context,
@@ -29,8 +28,6 @@ class LogViewerAdapter(
     private val inflater = LayoutInflater.from(context)
     private val density = context.resources.displayMetrics.density
     private val items = ArrayList<LogEntry>()
-    private val threadBackground = pillDrawable(THREAD_PILL_COLOR)
-    private val cardBackgrounds = HashMap<Int, GradientDrawable>()
     private var showFullMessage = false
 
     fun submit(entries: List<LogEntry>) {
@@ -68,9 +65,7 @@ class LogViewerAdapter(
 
         fun bind(entry: LogEntry) {
             val accentColor = levelColor(entry.level)
-            logCard.background = cardBackgrounds.getOrPut(entry.level) {
-                outlinedCardDrawable(accentColor)
-            }
+            logCard.background = outlinedCardDrawable(accentColor)
             tvTime.apply {
                 text = LogInspectorStore.formatTime(entry.timestamp)
                 setTextColor(MUTED_COLOR)
@@ -82,7 +77,7 @@ class LogViewerAdapter(
             tvThread.apply {
                 text = "Thread: ${entry.thread}"
                 setTextColor(MUTED_COLOR)
-                background = threadBackground
+                background = pillDrawable(THREAD_PILL_COLOR)
             }
             tvMessage.apply {
                 text = displayMessage(entry)

@@ -33,7 +33,12 @@ object LocalLogRepository {
 
     fun openPagedReader(file: File, pageSize: Int = DEFAULT_PAGE_SIZE): PagedReader? {
         if (!file.exists() || !file.isFile) return null
-        return PagedReader(file, scanSegments(file), pageSize)
+        val segments = scanSegments(file)
+        if (segments.isNotEmpty()) {
+            return PagedReader(file, segments, pageSize)
+        }
+        val fallbackEntries = readEntries(file).asReversed()
+        return if (fallbackEntries.isEmpty()) null else PagedReader(fallbackEntries, pageSize)
     }
 
     fun deleteAll(files: List<LocalLogFile>): Int {
@@ -75,7 +80,16 @@ object LocalLogRepository {
         private val segments: List<EntrySegment>,
         private val pageSize: Int
     ) {
+        private var fallbackEntries: List<LogEntry>? = null
         private var nextIndexExclusive = segments.size
+
+        internal constructor(
+            entries: List<LogEntry>,
+            pageSize: Int
+        ) : this(File(""), emptyList(), pageSize) {
+            fallbackEntries = entries
+            nextIndexExclusive = entries.size
+        }
 
         @Synchronized
         fun hasMore(): Boolean = nextIndexExclusive > 0
@@ -83,6 +97,13 @@ object LocalLogRepository {
         @Synchronized
         fun readNextPage(): List<LogEntry> {
             if (nextIndexExclusive <= 0) return emptyList()
+            val fallback = fallbackEntries
+            if (fallback != null) {
+                val fromIndex = max(0, nextIndexExclusive - pageSize)
+                val page = fallback.subList(fromIndex, nextIndexExclusive)
+                nextIndexExclusive = fromIndex
+                return page
+            }
             val fromIndex = max(0, nextIndexExclusive - pageSize)
             val pageSegments = segments.subList(fromIndex, nextIndexExclusive).asReversed()
             nextIndexExclusive = fromIndex
