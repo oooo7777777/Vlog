@@ -225,13 +225,8 @@ class LogViewerActivity : AppCompatActivity() {
     }
 
     private fun applyFilter() {
-        val availableTabs = LogInspectorStore.buildTabs(allLogs)
-        if (availableTabs.none { it.key == selectedTabKey }) {
-            selectedTabKey = LogInspectorStore.TAB_V_LOG
-        }
-        renderTabs(availableTabs)
         val keyword = etFilter.text.toString().trim()
-        val logs = allLogs.filter { entry ->
+        val baseFilteredLogs = allLogs.filter { entry ->
             val timeText = LogInspectorStore.formatTime(entry.timestamp)
             val keywordMatched = keyword.isEmpty() ||
                     entry.tag.contains(keyword, ignoreCase = true) ||
@@ -239,11 +234,15 @@ class LogViewerActivity : AppCompatActivity() {
                     timeText.contains(keyword, ignoreCase = true) ||
                     entry.message.contains(keyword, ignoreCase = true)
             val levelMatched = selectedLevel == null || entry.level == selectedLevel
-            val tabMatched = when (selectedTabKey) {
-                LogInspectorStore.TAB_V_LOG -> true
-                else -> entry.tag == selectedTabKey
-            }
-            keywordMatched && levelMatched && tabMatched
+            keywordMatched && levelMatched
+        }
+        val availableTabs = LogInspectorStore.buildTabs(baseFilteredLogs)
+        if (availableTabs.none { it.key == selectedTabKey }) {
+            selectedTabKey = LogInspectorStore.TAB_V_LOG
+        }
+        renderTabs(availableTabs)
+        val logs = baseFilteredLogs.filter { entry ->
+            LogInspectorStore.matchesTab(entry.tag, selectedTabKey)
         }
         adapter.submit(logs)
     }

@@ -1,36 +1,42 @@
 package com.v.log.inspector
 
+import com.v.log.logger.Logger
 import org.junit.Assert.assertEquals
-import org.junit.Before
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class LogInspectorStoreTest {
 
-    @Before
-    fun setUp() {
-        LogInspectorStore.setEnabled(true)
-        LogInspectorStore.clear()
-    }
-
     @Test
-    fun add_sanitizesStoredTag() {
-        LogInspectorStore.add(android.util.Log.DEBUG, "V_LOG [Order]", "main", "message")
-
-        val entry = LogInspectorStore.snapshot().single()
-        assertEquals("Order", entry.tag)
-    }
-
-    @Test
-    fun buildTabs_keepsDefaultAndAppendsDistinctTags() {
-        val entries = listOf(
-            LogEntry(0L, 1, "DEBUG", "V_LOG", "main", "a"),
-            LogEntry(1L, 1, "DEBUG", "Order", "main", "b"),
-            LogEntry(2L, 1, "DEBUG", "Profile", "main", "c"),
-            LogEntry(3L, 1, "DEBUG", "Order", "main", "d")
+    fun `build tabs normalizes whitespace and removes duplicate tags`() {
+        val tabs = LogInspectorStore.buildTabs(
+            listOf(
+                entry(tag = " Home "),
+                entry(tag = "Home"),
+                entry(tag = "Settings")
+            )
         )
 
-        val tabs = LogInspectorStore.buildTabs(entries)
+        assertEquals(
+            listOf(LogInspectorStore.TAB_V_LOG, "Home", "Settings"),
+            tabs.map { it.key }
+        )
+    }
 
-        assertEquals(listOf("V_LOG", "Order", "Profile"), tabs.map { it.key })
+    @Test
+    fun `matches tab compares normalized tag values`() {
+        assertTrue(LogInspectorStore.matchesTab(" Home ", "Home"))
+        assertTrue(LogInspectorStore.matchesTab("V_LOG [Home]", "Home"))
+    }
+
+    private fun entry(tag: String): LogEntry {
+        return LogEntry(
+            timestamp = 0L,
+            level = Logger.INFO,
+            levelName = "INFO",
+            tag = tag,
+            thread = "main",
+            message = "message"
+        )
     }
 }

@@ -42,13 +42,19 @@ object LogInspectorStore {
         tabs.add(LogTabItem(TAB_V_LOG, TAB_V_LOG))
         val customTabs = LinkedHashSet<String>()
         entries.forEach { entry ->
-            val custom = entry.tag.takeIf { it.isNotBlank() } ?: return@forEach
+            val custom = normalizeTabKey(entry.tag).takeIf { it.isNotBlank() } ?: return@forEach
             if (custom != TAB_V_LOG) {
                 customTabs.add(custom)
             }
         }
         customTabs.forEach { tabs.add(LogTabItem(it, it)) }
         return tabs
+    }
+
+    fun normalizeTabKey(tag: String): String = sanitizeTag(tag).trim()
+
+    fun matchesTab(entryTag: String, selectedTabKey: String): Boolean {
+        return selectedTabKey == TAB_V_LOG || normalizeTabKey(entryTag) == normalizeTabKey(selectedTabKey)
     }
 
     @Synchronized
@@ -95,7 +101,7 @@ object LogInspectorStore {
         return message.take(previewLength).trimEnd() + "..."
     }
 
-    fun sanitizeDisplayTag(tag: String): String = sanitizeTag(tag)
+    fun sanitizeDisplayTag(tag: String): String = normalizeTabKey(tag)
 
     private fun clipMessage(message: String): String {
         if (message.length <= MAX_MESSAGE_LENGTH) return message
