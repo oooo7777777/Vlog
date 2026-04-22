@@ -54,7 +54,7 @@ sdcard/Android/data/
 
    ```groovy
    dependencies {
-   	        implementation 'com.github.oooo7777777:Vlog:2.0.7'
+   	        implementation 'com.github.oooo7777777:Vlog:2.0.8'
    	}
    ```
 
@@ -138,7 +138,7 @@ VLog.flush();
 接入方依赖时请使用：
 
 ```groovy
-implementation 'com.github.oooo7777777:Vlog:2.0.7'
+implementation 'com.github.oooo7777777:Vlog:2.0.8'
 ```
 
 如果你在其他分支发布快照，就把 `master` 替换成对应分支名。分支名里如果有 `/`，JitPack 需要把它写成 `~`。
