@@ -1,10 +1,8 @@
 package com.v.demo
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import com.v.log.LogConfig
 import com.v.log.VLog
 import com.v.log.util.ZipUtils
 import com.v.log.util.log

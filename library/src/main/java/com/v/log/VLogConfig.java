@@ -5,7 +5,7 @@ import android.content.Context;
 import com.v.log.encrypt.LogEncrypt;
 
 
-public class LogConfig {
+public class VLogConfig {
 
     /**
      * 上下文(*必须)
@@ -68,11 +68,11 @@ public class LogConfig {
     private int logInspectorPreviewLength = 120;
 
 
-    public LogConfig(Context context) {
+    public VLogConfig(Context context) {
         mContext = context;
     }
 
-    public LogConfig(Context context, Boolean showLog, boolean isCaptureExceptions) {
+    public VLogConfig(Context context, Boolean showLog, boolean isCaptureExceptions) {
         mContext = context;
         if (isCaptureExceptions) {
             AppException.getInstance().init(mContext);
@@ -80,17 +80,17 @@ public class LogConfig {
         this.showLog = showLog;
     }
 
-    public LogConfig setLogEncrypt(LogEncrypt logEncrypt) {
+    public VLogConfig setLogEncrypt(LogEncrypt logEncrypt) {
         this.logEncrypt = logEncrypt;
         return this;
     }
 
-    public LogConfig maxLogSizeMb(double maxLogSizeMb) {
+    public VLogConfig maxLogSizeMb(double maxLogSizeMb) {
         this.maxLogSizeMb = maxLogSizeMb;
         return this;
     }
 
-    public LogConfig maxKeepDaily(int maxKeepDaily) {
+    public VLogConfig maxKeepDaily(int maxKeepDaily) {
         this.maxKeepDaily = maxKeepDaily;
         return this;
     }
@@ -99,7 +99,7 @@ public class LogConfig {
         return logPath;
     }
 
-    public LogConfig setLogPath(String mLogPath) {
+    public VLogConfig setLogPath(String mLogPath) {
         this.logPath = mLogPath;
         return this;
     }
@@ -108,7 +108,7 @@ public class LogConfig {
         return cachePath;
     }
 
-    public LogConfig setCachePath(String mCachePath) {
+    public VLogConfig setCachePath(String mCachePath) {
         this.cachePath = mCachePath;
         return this;
     }
@@ -165,7 +165,7 @@ public class LogConfig {
         return enableLogInspector;
     }
 
-    public LogConfig setEnableLogInspector(Boolean enableLogInspector) {
+    public VLogConfig setEnableLogInspector(Boolean enableLogInspector) {
         this.enableLogInspector = enableLogInspector;
         return this;
     }
@@ -174,7 +174,7 @@ public class LogConfig {
         return logInspectorPreviewLength;
     }
 
-    public LogConfig setLogInspectorPreviewLength(int logInspectorPreviewLength) {
+    public VLogConfig setLogInspectorPreviewLength(int logInspectorPreviewLength) {
         this.logInspectorPreviewLength = logInspectorPreviewLength;
         return this;
     }

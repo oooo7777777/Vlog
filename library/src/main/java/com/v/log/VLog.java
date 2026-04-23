@@ -25,7 +25,7 @@ public final class VLog {
     private VLog() {
     }
 
-    public static void init(LogConfig logConfig) {
+    public static void init(VLogConfig logConfig) {
         if (null == logConfig) {
             throw new RuntimeException("LogConfig can't be null");
         }

@@ -61,7 +61,7 @@ sdcard/Android/data/
 ## 初始化
 ```
 //初始化日志系统
- VLog.init(LogConfig(this, BuildConfig.DEBUG, true))
+ VLog.init(VLogConfig(this, BuildConfig.DEBUG, true))
 ```
 
 ## 开启通知栏日志入口
@@ -72,7 +72,7 @@ uses-permission android:name="android.permission.POST_NOTIFICATIONS"
 
 ```java
 VLog.init(
-        new LogConfig(this)
+        new VLogConfig(this)
                 .setEnableLogInspector(true)
 );
 ```

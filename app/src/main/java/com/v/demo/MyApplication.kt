@@ -1,7 +1,7 @@
 package com.v.demo
 
 import android.app.Application
-import com.v.log.LogConfig
+import com.v.log.VLogConfig
 import com.v.log.VLog
 
 /**
@@ -20,7 +20,7 @@ class MyApplication : Application() {
         super.onCreate()
         context = this
         VLog.init(
-            LogConfig(this, BuildConfig.DEBUG, true)
+            VLogConfig(this, BuildConfig.DEBUG, true)
                 .setEnableLogInspector(true)
         )
     }
