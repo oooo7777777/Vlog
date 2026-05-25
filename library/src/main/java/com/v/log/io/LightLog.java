@@ -19,6 +19,7 @@ public class LightLog {
     private static final long KB = 1024;
     private static final long MB = 1024 * KB;
     private static final long DEFAULT_CACHE_SIZE = 1 * KB;
+    private static final int MAX_WRITE_CHUNK_SIZE = 64 * 1024;
     private static final int MINUTE = 60 * 1000;
     private static final long DAY = 24 * 60 * 60 * 1000;
     private static final double DEFAULT_MAX_LOG_SIZE = 50;
@@ -26,6 +27,7 @@ public class LightLog {
 
     private static volatile LightLog sLightLog;
     private MappedByteBuffer mappedByteBuffer;
+    private long mappedBufferSize = DEFAULT_CACHE_SIZE;
 
 
     private String mCachePath; //log缓存目录
@@ -55,6 +57,8 @@ public class LightLog {
         mPath = path;
         mMaxLogSizeMb = maxLogSizeMb;
         mMaxKeepDaily = maxKeepDaily;
+        mappedBufferSize = DEFAULT_CACHE_SIZE;
+        mappedByteBuffer = null;
         if (TextUtils.isEmpty(mCachePath) || TextUtils.isEmpty(mPath)) {
             throw new RuntimeException("init method is not invoked");
         }
@@ -112,6 +116,7 @@ public class LightLog {
             fileWriter.close();
             unmap(mappedByteBuffer);
             mappedByteBuffer = null;
+            mappedBufferSize = DEFAULT_CACHE_SIZE;
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -168,22 +173,34 @@ public class LightLog {
         }
 
         try {
-            MappedByteBuffer mbbi = getMappedByteBuffer();
-            if (mbbi != null) {
-                mbbi.put(log);
+            int offset = 0;
+            while (offset < log.length) {
+                int remaining = log.length - offset;
+                MappedByteBuffer mbbi = getMappedByteBuffer(Math.min(remaining, MAX_WRITE_CHUNK_SIZE));
+                if (mbbi == null) {
+                    return;
+                }
+                int writable = Math.min(mbbi.remaining(), remaining);
+                if (writable <= 0) {
+                    String currentDate = DateUtil.getDateStr(System.currentTimeMillis());
+                    flush(currentDate);
+                    continue;
+                }
+                mbbi.put(log, offset, writable);
+                offset += writable;
+                if (offset < log.length && !mbbi.hasRemaining()) {
+                    String currentDate = DateUtil.getDateStr(System.currentTimeMillis());
+                    flush(currentDate);
+                }
             }
         } catch (BufferOverflowException e) {
             //缓存区满了则flush到日志文件
             String currentDate = DateUtil.getDateStr(System.currentTimeMillis());
             flush(currentDate);
 
-            MappedByteBuffer mbbi = getMappedByteBuffer();
-            if (mbbi != null) {
-                mbbi.put(log);
-            }
-//            e.printStackTrace();
+            write(log);
         } catch (ReadOnlyBufferException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
         }
     }
 
@@ -243,9 +260,15 @@ public class LightLog {
         return mCachePath + File.separator + "cache.log";
     }
 
-    private MappedByteBuffer getMappedByteBuffer() {
+    private MappedByteBuffer getMappedByteBuffer(int requiredSize) {
+        long desiredSize = Math.max(DEFAULT_CACHE_SIZE, Math.min(MAX_WRITE_CHUNK_SIZE, requiredSize));
         if (null != mappedByteBuffer) {
-            return mappedByteBuffer;
+            if (mappedBufferSize >= desiredSize && mappedByteBuffer.remaining() > 0) {
+                return mappedByteBuffer;
+            }
+            unmap(mappedByteBuffer);
+            mappedByteBuffer = null;
+            mappedBufferSize = DEFAULT_CACHE_SIZE;
         }
         RandomAccessFile rafi;
         FileChannel fci;
@@ -265,9 +288,10 @@ public class LightLog {
                 flush(currentDate);
             }
 
-            MappedByteBuffer mbbi = fci.map(FileChannel.MapMode.READ_WRITE, 0, DEFAULT_CACHE_SIZE);
+            MappedByteBuffer mbbi = fci.map(FileChannel.MapMode.READ_WRITE, 0, desiredSize);
             if (null != mbbi) {
                 mappedByteBuffer = mbbi;
+                mappedBufferSize = desiredSize;
                 return mbbi;
             }
         } catch (IOException e) {

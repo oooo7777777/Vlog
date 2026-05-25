@@ -22,38 +22,43 @@ public class ALogger implements Logger {
     }
 
     @Override
-    public void v(String tag, Boolean save, String message) {
-        log(VERBOSE, null, tag, save, true, message);
+    public void v(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        log(VERBOSE, null, tag, save, true, beautify, detailed, message);
     }
 
     @Override
-    public void d(String tag, Boolean save, String message) {
-        log(DEBUG, null, tag, save, true, message);
+    public void d(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        log(DEBUG, null, tag, save, true, beautify, detailed, message);
     }
 
     @Override
-    public void e(String tag, Boolean save, String message) {
-        log(ERROR, null, tag, save, true, message);
+    public void e(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        log(ERROR, null, tag, save, true, beautify, detailed, message);
     }
 
     @Override
-    public void w(String tag, Boolean save, String message) {
-        log(WARN, null, tag, save, true, message);
+    public void w(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        log(WARN, null, tag, save, true, beautify, detailed, message);
     }
 
     @Override
-    public void a(String tag, Boolean save, String message) {
-        log(ASSERT, null, tag, save, true, message);
+    public void a(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        log(ASSERT, null, tag, save, true, beautify, detailed, message);
     }
 
     @Override
-    public void i(String tag, Boolean save, Boolean show, String message) {
-        log(INFO, null, tag, save, show, message);
+    public void i(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        log(INFO, null, tag, save, show, beautify, detailed, message);
+    }
+
+    @Override
+    public void logDefault(String tag, String message) {
+        log(Logger.DEFAULT, null, tag, false, true, true, true, message);
     }
 
 
     @Override
-    public synchronized void log(int priority, String tag, Boolean save, Boolean show, String message, Throwable throwable) {
+    public synchronized void log(int priority, String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message, Throwable throwable) {
         if (throwable != null && message != null) {
             message += " : " + LogUtils.getStackTraceString(throwable);
         }
@@ -71,7 +76,7 @@ public class ALogger implements Logger {
         }
 
         for (Printer printer : logPrinters) {
-            printer.log(priority, tag, message, save, show);
+            printer.log(priority, tag, message, save, show, beautify, detailed);
         }
     }
 
@@ -97,16 +102,16 @@ public class ALogger implements Logger {
 
     }
 
-    private synchronized void log(int priority, Throwable throwable, String tag, Boolean save, Boolean show, String message) {
+    private synchronized void log(int priority, Throwable throwable, String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
         String tagFormat = tag;
-        if (!LogExtKt.TAG.equals(tag)) {
+        if (!ConfigCenter.getInstance().getTag().equals(tag)) {
             tagFormat = tag;
         }
         if (tag.length() > 50) {
             tagFormat = tag.substring(0, 50);
         }
-        tagFormat = LogExtKt.TAG + " [" + tagFormat + "]";
-        log(priority, tagFormat, save, show, message, throwable);
+        tagFormat = ConfigCenter.getInstance().getTag() + " [" + tagFormat + "]";
+        log(priority, tagFormat, save, show, beautify, detailed, message, throwable);
     }
 
 

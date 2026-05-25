@@ -39,8 +39,8 @@ public final class VLog {
         }
         configCenter.setMaxKeepDaily(logConfig.getMaxKeepDaily());
         configCenter.setMaxLogSizeMb(logConfig.getMaxLogSizeMb());
-        configCenter.setmLogPath(logConfig.getLogPath());
-        configCenter.setmCachePath(logConfig.getCachePath());
+        configCenter.setLogPath(logConfig.getLogPath());
+        configCenter.setCachePath(logConfig.getCachePath());
         configCenter.setSaveLog(logConfig.getSaveLog());
         configCenter.setShowLog(logConfig.getShowLog());
         configCenter.setShowDetailedLog(logConfig.getShowDetailedLog());
@@ -83,30 +83,33 @@ public final class VLog {
     }
 
 
-    public static void d(String tag, Boolean save, String message) {
-        sLogger.d(tag, save, message);
+    public static void d(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        sLogger.d(tag, save, beautify, detailed, message);
     }
 
-    public static void v(String tag, Boolean save, String message) {
-        sLogger.v(tag, save, message);
-    }
-
-
-    public static void e(String tag, Boolean save, String message) {
-        sLogger.e(tag, save, message);
-    }
-
-    public static void i(String tag, Boolean save, Boolean show, String message) {
-        sLogger.i(tag, save, show, message);
+    public static void v(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        sLogger.v(tag, save, beautify, detailed, message);
     }
 
 
-    public static void w(String tag, Boolean save, String message) {
-        sLogger.w(tag, save, message);
+    public static void e(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        sLogger.e(tag, save, beautify, detailed, message);
     }
 
-    public static void a(String tag, Boolean save, String message) {
-        sLogger.a(tag, save, message);
+    public static void i(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        sLogger.i(tag, save, show, beautify, detailed, message);
+    }
+
+
+    public static void w(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        sLogger.w(tag, save, beautify, detailed, message);
+    }
+
+    public static void a(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
+        sLogger.a(tag, save, beautify, detailed, message);
+    }
+    public static void logDefault(String tag,  String message) {
+        sLogger.logDefault(tag, message);
     }
 
     /**

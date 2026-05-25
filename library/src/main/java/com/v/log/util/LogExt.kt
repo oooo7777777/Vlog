@@ -2,24 +2,39 @@ package com.v.log.util
 
 import android.util.Log
 import com.v.log.VLog
+import com.v.log.config.ConfigCenter
+import com.v.log.logger.Logger
 
-const val TAG = "V_LOG"
 
 @JvmOverloads
-fun Any.logD(tag: String = TAG, save: Boolean = true) = run {
+fun Any.logD(
+    tag: String = ConfigCenter.getInstance().tag,
+    save: Boolean = ConfigCenter.getInstance().saveLog,
+    beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+) = run {
     this.showLog(
         tag = tag,
         level = Log.DEBUG,
-        saveLog = save
+        saveLog = save,
+        beautify = beautify,
+        detailed = detailed
     )
 }
 
 @JvmOverloads
-fun Any.logV(tag: String = TAG, save: Boolean = true) = run {
+fun Any.logV(
+    tag: String = ConfigCenter.getInstance().tag,
+    save: Boolean = ConfigCenter.getInstance().saveLog,
+    beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+) = run {
     this.showLog(
         tag = tag,
         level = Log.VERBOSE,
-        saveLog = save
+        saveLog = save,
+        beautify = beautify,
+        detailed = detailed
     )
 }
 
@@ -28,73 +43,114 @@ fun Any.logV(tag: String = TAG, save: Boolean = true) = run {
  */
 fun Any.log() = run {
     this.showLog(
-        TAG,
-        Log.INFO,
-        saveLog = false
+        ConfigCenter.getInstance().tag,
+        Logger.DEFAULT,
+        saveLog = false,
+        beautify = false,
+        detailed = false,
     )
 }
 
-fun Any.log(tag: String = TAG) = run {
+fun Any.log(tag: String = ConfigCenter.getInstance().tag) = run {
     this.showLog(
         tag,
-        Log.INFO,
-        saveLog = false
+        Logger.DEFAULT,
+        saveLog = false,
+        beautify = false,
+        detailed = false,
     )
 }
 
 /**
  * 此方法保存日志不会打印日志
  */
-fun Any.logSave() = run {
+fun Any.logSave(
+    tag: String = ConfigCenter.getInstance().tag,
+    beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+) = run {
     this.showLog(
-        TAG,
+        tag,
         Log.INFO,
         saveLog = true,
-        showLog = false
+        showLog = false,
+        beautify = beautify,
+        detailed = detailed
     )
 }
 
+
 @JvmOverloads
-fun Any.logI(tag: String = TAG, save: Boolean = true) = run {
+fun Any.logI(
+    tag: String = ConfigCenter.getInstance().tag,
+    save: Boolean = ConfigCenter.getInstance().saveLog,
+    beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+) = run {
     this.showLog(
         tag = tag,
         level = Log.INFO,
-        saveLog = save
+        saveLog = save,
+        beautify = beautify,
+        detailed = detailed
     )
 }
 
 @JvmOverloads
-fun Any.logW(tag: String = TAG, save: Boolean = true) = run {
+fun Any.logW(
+    tag: String = ConfigCenter.getInstance().tag,
+    save: Boolean = ConfigCenter.getInstance().saveLog,
+    beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+) = run {
     this.showLog(
         tag = tag,
         level = Log.WARN,
-        saveLog = save
+        saveLog = save,
+        beautify = beautify,
+        detailed = detailed
     )
 }
 
 @JvmOverloads
-fun Any.logE(tag: String = TAG, save: Boolean = true) = run {
+fun Any.logE(
+    tag: String = ConfigCenter.getInstance().tag,
+    save: Boolean = ConfigCenter.getInstance().saveLog,
+    beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+) = run {
     this.showLog(
         tag = tag,
         level = Log.ERROR,
-        saveLog = save
+        saveLog = save,
+        beautify = beautify,
+        detailed = detailed
     )
 }
 
 @JvmOverloads
-fun Any.logA(tag: String = TAG, save: Boolean = true) = run {
+fun Any.logA(
+    tag: String = ConfigCenter.getInstance().tag,
+    save: Boolean = ConfigCenter.getInstance().saveLog,
+    beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+) = run {
     this.showLog(
         tag = tag,
         level = Log.ASSERT,
-        saveLog = save
+        saveLog = save,
+        beautify = beautify,
+        detailed = detailed
     )
 }
 
 private fun Any.showLog(
-    tag: String = TAG,
+    tag: String=ConfigCenter.getInstance().tag,
     level: Int = Log.INFO,
-    saveLog: Boolean = true,
-    showLog: Boolean = true
+    saveLog: Boolean = ConfigCenter.getInstance().saveLog,
+    showLog: Boolean = ConfigCenter.getInstance().showLog,
+    beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
 ) = run {
 
     var msg = this.toString()
@@ -107,6 +163,8 @@ private fun Any.showLog(
             VLog.v(
                 tag,
                 saveLog,
+                beautify,
+                detailed,
                 msg
             )
         }
@@ -115,6 +173,8 @@ private fun Any.showLog(
             VLog.d(
                 tag,
                 saveLog,
+                beautify,
+                detailed,
                 msg
             )
         }
@@ -123,6 +183,8 @@ private fun Any.showLog(
             VLog.w(
                 tag,
                 saveLog,
+                beautify,
+                detailed,
                 msg
             )
         }
@@ -131,6 +193,8 @@ private fun Any.showLog(
             VLog.e(
                 tag,
                 saveLog,
+                beautify,
+                detailed,
                 msg
             )
         }
@@ -139,17 +203,24 @@ private fun Any.showLog(
             VLog.a(
                 tag,
                 saveLog,
+                beautify,
+                detailed,
+                msg
+            )
+        }
+        Log.INFO -> {
+            VLog.i(
+                tag,
+                saveLog,
+                showLog,
+                beautify,
+                detailed,
                 msg
             )
         }
 
         else -> {
-            VLog.i(
-                tag,
-                saveLog,
-                showLog,
-                msg
-            )
+            VLog.logDefault(tag, msg)
         }
 
     }

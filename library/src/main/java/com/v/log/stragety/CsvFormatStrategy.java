@@ -5,6 +5,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.v.log.config.ConfigCenter;
+import com.v.log.logger.Logger;
 import com.v.log.util.LogUtils;
 
 import java.text.SimpleDateFormat;
@@ -47,7 +48,12 @@ public class CsvFormatStrategy implements DiskLogStrategy {
     }
 
     @Override
-    public void log(int priority, String onceOnlyTag, String message, Boolean save, Boolean show) {
+    public void log(int priority, String onceOnlyTag, String message, Boolean save, Boolean show, Boolean beautify, Boolean detailed) {
+
+        if (priority == Logger.DEFAULT && !save) {
+            Log.i(onceOnlyTag,message);
+            return;
+        }
 
         date.setTime(System.currentTimeMillis());
         String logLevel = LogUtils.logLevel(priority);
@@ -83,12 +89,20 @@ public class CsvFormatStrategy implements DiskLogStrategy {
         builder.append(NEW_LINE);
 
         //打印日志
-        if (ConfigCenter.getInstance().getShowLog() && show) {
+        if (show) {
+            if (priority == Logger.DEFAULT) {
+                Log.i(onceOnlyTag,message);
+                return;
+            }
             //打印详细日志
-            if (ConfigCenter.getInstance().getShowDetailedLog()) {
-                logFormat(priority, onceOnlyTag, builder.toString());
+            if (Boolean.TRUE.equals(detailed)) {
+                if (Boolean.TRUE.equals(beautify)) {
+                    logFormat(priority, onceOnlyTag, builder.toString());
+                } else {
+                    Log.println(priority, onceOnlyTag, builder.toString());
+                }
             } else {
-                if (ConfigCenter.getInstance().getBeautifyLog()) {
+                if (Boolean.TRUE.equals(beautify)) {
                     logFormat(priority, onceOnlyTag, message);
                 } else {
                     Log.println(priority, onceOnlyTag, message);
@@ -97,11 +111,8 @@ public class CsvFormatStrategy implements DiskLogStrategy {
         }
 
         //是否需要保存在本地
-        if (ConfigCenter.getInstance().getSaveLog() && save) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("============================================================" + logLevel + "===========================================================>");
-            sb.append(NEW_LINE);
-            logStrategy.log(priority, onceOnlyTag, sb+builder.toString(), true, show);
+        if (save) {
+            logStrategy.log(priority, onceOnlyTag, builder.toString(), true, show, beautify, detailed);
         }
     }
 

@@ -15,7 +15,6 @@ public class JavaDemo {
         LogExtKt.logW("logW", "V_LOG", true);
         LogExtKt.logI("logI", "V_LOG", true);
         LogExtKt.log("只打印3333333333");
-        LogExtKt.logSave("只保存444444444444");
 
     }
 }

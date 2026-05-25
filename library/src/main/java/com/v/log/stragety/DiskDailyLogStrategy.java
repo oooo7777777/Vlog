@@ -26,7 +26,7 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
     }
 
     private void initNativeLogger() {
-        LightLog.newInstance().init(ConfigCenter.getInstance().getmCachePath(),
+        LightLog.newInstance().init(ConfigCenter.getInstance().getCachePath(),
                 ConfigCenter.getInstance().getLogPath(),
                 ConfigCenter.getInstance().getMaxLogSizeMb(),
                 ConfigCenter.getInstance().getMaxKeepDaily());
@@ -63,7 +63,7 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
     }
 
     @Override
-    public void log(int level, String tag, final String message, Boolean save, Boolean show) {
+    public void log(int level, String tag, final String message, Boolean save, Boolean show, Boolean beautify, Boolean detailed) {
         //保存在本地
         ALogThreadPool.getFixedThreadPool().execute(new Runnable() {
             @Override

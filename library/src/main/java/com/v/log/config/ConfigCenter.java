@@ -34,14 +34,14 @@ public class ConfigCenter {
     /**
      * 日志保存路径
      */
-    private String mLogPath;
+    private String logPath;
 
     /**
      * 日志缓存路径
      */
-    private String mCachePath;
+    private String cachePath;
 
-    private Context mContext;
+    private Context context;
 
 
     /**
@@ -63,6 +63,16 @@ public class ConfigCenter {
      * 是否保存所有日志
      */
     private Boolean saveLog = true;
+
+    private String tag = "V_LOG";
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
 
     private static class ConfigHolder {
         private static final ConfigCenter instance = new ConfigCenter();
@@ -125,38 +135,38 @@ public class ConfigCenter {
     }
 
     public String getLogPath() {
-        if (TextUtils.isEmpty(mLogPath)) {
-            mLogPath = getDefaultLogPath();
+        if (TextUtils.isEmpty(logPath)) {
+            logPath = getDefaultLogPath();
         }
-        return mLogPath;
+        return logPath;
     }
 
-    public String getmCachePath() {
-        if (TextUtils.isEmpty(mCachePath)) {
-            mCachePath = getDefaultCachePath();
+    public String getCachePath() {
+        if (TextUtils.isEmpty(cachePath)) {
+            cachePath = getDefaultCachePath();
         }
-        return mCachePath;
+        return cachePath;
     }
 
-    public void setmLogPath(String mLogPath) {
-        this.mLogPath = mLogPath;
+    public void setLogPath(String mLogPath) {
+        this.logPath = mLogPath;
     }
 
-    public void setmCachePath(String mCachePath) {
-        this.mCachePath = mCachePath;
+    public void setCachePath(String mCachePath) {
+        this.cachePath = mCachePath;
     }
 
     public Context getContext() {
-        if (mContext == null) throw new RuntimeException("ConfigCenter context can not be null");
-        return mContext;
+        if (context == null) throw new RuntimeException("ConfigCenter context can not be null");
+        return context;
     }
 
     public Context peekContext() {
-        return mContext;
+        return context;
     }
 
     public void setContext(Context context) {
-        mContext = context;
+       this.context = context;
     }
 
     /**
