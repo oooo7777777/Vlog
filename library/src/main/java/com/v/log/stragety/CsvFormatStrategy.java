@@ -112,7 +112,10 @@ public class CsvFormatStrategy implements DiskLogStrategy {
 
         //是否需要保存在本地
         if (save) {
-            logStrategy.log(priority, onceOnlyTag, builder.toString(), true, show, beautify, detailed);
+            StringBuilder sb = new StringBuilder();
+            sb.append("============================================================" + logLevel + "===========================================================>");
+            sb.append(NEW_LINE);
+            logStrategy.log(priority, onceOnlyTag, sb+builder.toString(), true, show, beautify, detailed);
         }
     }
 
