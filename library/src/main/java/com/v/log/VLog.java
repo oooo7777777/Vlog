@@ -83,17 +83,17 @@ public final class VLog {
     }
 
 
-    public static void d(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        sLogger.d(tag, save, beautify, detailed, message);
+    public static void d(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        sLogger.d(tag, save, show, beautify, detailed, message);
     }
 
-    public static void v(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        sLogger.v(tag, save, beautify, detailed, message);
+    public static void v(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        sLogger.v(tag, save, show, beautify, detailed, message);
     }
 
 
-    public static void e(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        sLogger.e(tag, save, beautify, detailed, message);
+    public static void e(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        sLogger.e(tag, save, show, beautify, detailed, message);
     }
 
     public static void i(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
@@ -101,15 +101,15 @@ public final class VLog {
     }
 
 
-    public static void w(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        sLogger.w(tag, save, beautify, detailed, message);
+    public static void w(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        sLogger.w(tag, save, show, beautify, detailed, message);
     }
 
-    public static void a(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        sLogger.a(tag, save, beautify, detailed, message);
+    public static void a(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        sLogger.a(tag, save, show, beautify, detailed, message);
     }
-    public static void logDefault(String tag,  String message) {
-        sLogger.logDefault(tag, message);
+    public static void logDefault(String tag, Boolean show, String message) {
+        sLogger.logDefault(tag, show, message);
     }
 
     /**

@@ -22,28 +22,28 @@ public class ALogger implements Logger {
     }
 
     @Override
-    public void v(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        log(VERBOSE, null, tag, save, true, beautify, detailed, message);
+    public void v(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        log(VERBOSE, null, tag, save, show, beautify, detailed, message);
     }
 
     @Override
-    public void d(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        log(DEBUG, null, tag, save, true, beautify, detailed, message);
+    public void d(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        log(DEBUG, null, tag, save, show, beautify, detailed, message);
     }
 
     @Override
-    public void e(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        log(ERROR, null, tag, save, true, beautify, detailed, message);
+    public void e(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        log(ERROR, null, tag, save, show, beautify, detailed, message);
     }
 
     @Override
-    public void w(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        log(WARN, null, tag, save, true, beautify, detailed, message);
+    public void w(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        log(WARN, null, tag, save, show, beautify, detailed, message);
     }
 
     @Override
-    public void a(String tag, Boolean save, Boolean beautify, Boolean detailed, String message) {
-        log(ASSERT, null, tag, save, true, beautify, detailed, message);
+    public void a(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {
+        log(ASSERT, null, tag, save, show, beautify, detailed, message);
     }
 
     @Override
@@ -52,8 +52,8 @@ public class ALogger implements Logger {
     }
 
     @Override
-    public void logDefault(String tag, String message) {
-        log(Logger.DEFAULT, null, tag, false, true, true, true, message);
+    public void logDefault(String tag, Boolean show, String message) {
+        log(Logger.DEFAULT, null, tag, false, show, true, true, message);
     }
 
 

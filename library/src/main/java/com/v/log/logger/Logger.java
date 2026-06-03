@@ -15,19 +15,19 @@ public interface Logger {
     public static final int ASSERT = 7;
     public static final int DEFAULT = -1;
 
-    void v(String tag, Boolean save, Boolean beautify, Boolean detailed, String message);
+    void v(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message);
 
-    void d(String tag, Boolean save, Boolean beautify, Boolean detailed, String message);
+    void d(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message);
 
-    void e(String tag, Boolean save, Boolean beautify, Boolean detailed, String message);
+    void e(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message);
 
-    void w(String tag, Boolean save, Boolean beautify, Boolean detailed, String message);
+    void w(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message);
 
-    void a(String tag, Boolean save, Boolean beautify, Boolean detailed, String message);
+    void a(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message);
 
     void i(String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message);
 
-    void logDefault(String tag, String message);
+    void logDefault(String tag, Boolean show, String message);
 
     void log(int priority, String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message, Throwable throwable);
 

@@ -11,12 +11,14 @@ fun Any.logD(
     tag: String = ConfigCenter.getInstance().tag,
     save: Boolean = ConfigCenter.getInstance().saveLog,
     beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
-    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog,
+    show: Boolean = ConfigCenter.getInstance().showLog
 ) = run {
     this.showLog(
         tag = tag,
         level = Log.DEBUG,
         saveLog = save,
+        showLog = show,
         beautify = beautify,
         detailed = detailed
     )
@@ -27,12 +29,14 @@ fun Any.logV(
     tag: String = ConfigCenter.getInstance().tag,
     save: Boolean = ConfigCenter.getInstance().saveLog,
     beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
-    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog,
+    show: Boolean = ConfigCenter.getInstance().showLog
 ) = run {
     this.showLog(
         tag = tag,
         level = Log.VERBOSE,
         saveLog = save,
+        showLog = show,
         beautify = beautify,
         detailed = detailed
     )
@@ -85,12 +89,14 @@ fun Any.logI(
     tag: String = ConfigCenter.getInstance().tag,
     save: Boolean = ConfigCenter.getInstance().saveLog,
     beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
-    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog,
+    show: Boolean = ConfigCenter.getInstance().showLog
 ) = run {
     this.showLog(
         tag = tag,
         level = Log.INFO,
         saveLog = save,
+        showLog = show,
         beautify = beautify,
         detailed = detailed
     )
@@ -101,12 +107,14 @@ fun Any.logW(
     tag: String = ConfigCenter.getInstance().tag,
     save: Boolean = ConfigCenter.getInstance().saveLog,
     beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
-    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog,
+    show: Boolean = ConfigCenter.getInstance().showLog
 ) = run {
     this.showLog(
         tag = tag,
         level = Log.WARN,
         saveLog = save,
+        showLog = show,
         beautify = beautify,
         detailed = detailed
     )
@@ -117,12 +125,14 @@ fun Any.logE(
     tag: String = ConfigCenter.getInstance().tag,
     save: Boolean = ConfigCenter.getInstance().saveLog,
     beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
-    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog,
+    show: Boolean = ConfigCenter.getInstance().showLog
 ) = run {
     this.showLog(
         tag = tag,
         level = Log.ERROR,
         saveLog = save,
+        showLog = show,
         beautify = beautify,
         detailed = detailed
     )
@@ -133,12 +143,14 @@ fun Any.logA(
     tag: String = ConfigCenter.getInstance().tag,
     save: Boolean = ConfigCenter.getInstance().saveLog,
     beautify: Boolean = ConfigCenter.getInstance().beautifyLog,
-    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog
+    detailed: Boolean = ConfigCenter.getInstance().showDetailedLog,
+    show: Boolean = ConfigCenter.getInstance().showLog
 ) = run {
     this.showLog(
         tag = tag,
         level = Log.ASSERT,
         saveLog = save,
+        showLog = show,
         beautify = beautify,
         detailed = detailed
     )
@@ -163,6 +175,7 @@ private fun Any.showLog(
             VLog.v(
                 tag,
                 saveLog,
+                showLog,
                 beautify,
                 detailed,
                 msg
@@ -173,6 +186,7 @@ private fun Any.showLog(
             VLog.d(
                 tag,
                 saveLog,
+                showLog,
                 beautify,
                 detailed,
                 msg
@@ -183,6 +197,7 @@ private fun Any.showLog(
             VLog.w(
                 tag,
                 saveLog,
+                showLog,
                 beautify,
                 detailed,
                 msg
@@ -193,6 +208,7 @@ private fun Any.showLog(
             VLog.e(
                 tag,
                 saveLog,
+                showLog,
                 beautify,
                 detailed,
                 msg
@@ -203,6 +219,7 @@ private fun Any.showLog(
             VLog.a(
                 tag,
                 saveLog,
+                showLog,
                 beautify,
                 detailed,
                 msg
@@ -220,7 +237,7 @@ private fun Any.showLog(
         }
 
         else -> {
-            VLog.logDefault(tag, msg)
+            VLog.logDefault(tag, showLog, msg)
         }
 
     }

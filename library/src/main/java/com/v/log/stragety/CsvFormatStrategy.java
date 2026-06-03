@@ -50,7 +50,7 @@ public class CsvFormatStrategy implements DiskLogStrategy {
     @Override
     public void log(int priority, String onceOnlyTag, String message, Boolean save, Boolean show, Boolean beautify, Boolean detailed) {
 
-        if (priority == Logger.DEFAULT && !save) {
+        if (priority == Logger.DEFAULT && !save && Boolean.TRUE.equals(show)) {
             Log.i(onceOnlyTag,message);
             return;
         }
