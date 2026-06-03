@@ -80,6 +80,24 @@ wait_for_jitpack() {
   return 1
 }
 
+tag_commit() {
+  git rev-list -n 1 "$1"
+}
+
+remote_tag_commit() {
+  local version="$1"
+  local ref
+  ref="$(git ls-remote --tags origin "refs/tags/${version}^{}" | awk 'NR == 1 {print $1}')"
+  if [[ -z "$ref" ]]; then
+    ref="$(git ls-remote --tags origin "refs/tags/${version}" | awk 'NR == 1 {print $1}')"
+  fi
+  echo "$ref"
+}
+
+is_release_head() {
+  [[ "$(git log -1 --format=%s)" == "release: $VERSION" ]]
+}
+
 DIRTY_FILES=()
 while IFS= read -r file; do
   [[ -n "$file" ]] && DIRTY_FILES+=("$file")
@@ -98,20 +116,57 @@ if [[ ${#DIRTY_FILES[@]} -gt 0 ]]; then
   done
 fi
 
+RESUME_RELEASE=false
 if git rev-parse -q --verify "refs/tags/$VERSION" >/dev/null; then
-  echo "Tag $VERSION already exists."
+  LOCAL_TAG_SHA="$(tag_commit "$VERSION")"
+  HEAD_SHA="$(git rev-parse HEAD)"
+  if [[ "$LOCAL_TAG_SHA" != "$HEAD_SHA" ]]; then
+    echo "Tag $VERSION already exists but points to $LOCAL_TAG_SHA, not HEAD $HEAD_SHA."
+    echo "Use a new version, or inspect the existing tag before releasing."
+    exit 1
+  fi
+  if ! is_release_head; then
+    echo "Tag $VERSION already exists on HEAD, but HEAD is not release: $VERSION."
+    echo "Inspect the existing tag before releasing."
+    exit 1
+  fi
+  echo "Tag $VERSION already exists on the current release commit. Resuming release."
+  RESUME_RELEASE=true
+fi
+
+if [[ "$RESUME_RELEASE" == false ]]; then
+  sed -i.bak "s/^VLOG_VERSION=.*/VLOG_VERSION=$VERSION/" "$VERSION_FILE"
+  sed -i.bak "s/com.github.oooo7777777:Vlog:[^']*/com.github.oooo7777777:Vlog:$VERSION/" "$README_FILE"
+  rm -f "$VERSION_FILE.bak" "$README_FILE.bak"
+
+  git add "$VERSION_FILE" "$README_FILE" "$ROOT_DIR/library/build.gradle"
+  if git diff --cached --quiet; then
+    if is_release_head; then
+      echo "Release commit for $VERSION already exists on HEAD. Creating missing tag."
+    else
+      echo "No release changes to commit for $VERSION."
+      exit 1
+    fi
+  else
+    git commit -m "release: $VERSION"
+  fi
+  git tag "$VERSION"
+fi
+
+LOCAL_TAG_SHA="$(tag_commit "$VERSION")"
+REMOTE_TAG_SHA="$(remote_tag_commit "$VERSION")"
+if [[ -n "$REMOTE_TAG_SHA" && "$REMOTE_TAG_SHA" != "$LOCAL_TAG_SHA" ]]; then
+  echo "Remote tag $VERSION points to $REMOTE_TAG_SHA, but local tag points to $LOCAL_TAG_SHA."
+  echo "Refusing to overwrite the remote tag."
   exit 1
 fi
 
-sed -i.bak "s/^VLOG_VERSION=.*/VLOG_VERSION=$VERSION/" "$VERSION_FILE"
-sed -i.bak "s/com.github.oooo7777777:Vlog:[^']*/com.github.oooo7777777:Vlog:$VERSION/" "$README_FILE"
-rm -f "$VERSION_FILE.bak" "$README_FILE.bak"
-
-git add "$VERSION_FILE" "$README_FILE" "$ROOT_DIR/library/build.gradle"
-git commit -m "release: $VERSION"
-git tag "$VERSION"
 git push origin HEAD
-git push origin "$VERSION"
+if [[ -n "$REMOTE_TAG_SHA" ]]; then
+  echo "Remote tag $VERSION already exists and matches local tag."
+else
+  git push origin "$VERSION"
+fi
 
 echo "Release $VERSION pushed."
 wait_for_jitpack "$VERSION"
