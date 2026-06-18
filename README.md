@@ -55,7 +55,7 @@ sdcard/Android/data/
 
    ```groovy
    dependencies {
-   	        implementation 'com.github.oooo7777777:Vlog:2.1.4'
+   	        implementation 'com.github.oooo7777777:Vlog:2.1.5'
    	}
    ```
 
