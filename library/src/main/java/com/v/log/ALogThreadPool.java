@@ -3,6 +3,7 @@ package com.v.log;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -11,6 +12,10 @@ public final class ALogThreadPool {
     private final static ExecutorService sGlobalFixedThreadPool = Executors.newFixedThreadPool(1, new DefaultThreadFactory());
     public static Executor getFixedThreadPool() {
         return sGlobalFixedThreadPool;
+    }
+
+    public static Future<?> submit(Runnable runnable) {
+        return sGlobalFixedThreadPool.submit(runnable);
     }
 
     private static class DefaultThreadFactory implements ThreadFactory {

@@ -33,11 +33,6 @@ public class VLogConfig {
     private String logPath;
 
     /**
-     * 日志缓存路径
-     */
-    private String cachePath;
-
-    /**
      * 是否打印日志
      */
     private Boolean showLog = true;
@@ -101,15 +96,6 @@ public class VLogConfig {
 
     public VLogConfig setLogPath(String mLogPath) {
         this.logPath = mLogPath;
-        return this;
-    }
-
-    public String getCachePath() {
-        return cachePath;
-    }
-
-    public VLogConfig setCachePath(String mCachePath) {
-        this.cachePath = mCachePath;
         return this;
     }
 

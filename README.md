@@ -1,15 +1,16 @@
 # 日志系统框架
 
-VLog 是一个基于mmap， 高性能，高可用的，无丢失的，简单易用的日志系统框架。
+VLog 是一个基于后台串行写入与批量刷盘策略的高性能、高可用、简单易用的日志系统框架。
 sdcard/Android/data/
 ## 特性介绍  
 
 | 特性|简介|
 | ------ | ------ |
 |自定义日志保存路径 |默认保存在Android/data/com.xxxx.xxxx/files/log中|
-|自定义日志缓存路径|默认保存在Android/data/com.xxxx.xxxx/files/cache中|
 |自定义日志最大容量|默认70M，超过最大容量就不再写入|
 |日志按天保存，自定义日志保存天数|默认保存最近7天的日志，超过七天的日志将会被删除|
+|后台单线程顺序写入 |日志写入不阻塞主线程，适合高频日志场景|
+|批量刷盘策略|按时间和累计字节数批量刷盘，兼顾性能与可靠性|
 |自定义日志加密方式|默认不加密，可以实现LogEncrypt接口，实现自定义的加密方式|
 |日志记录通用信息|在日志系统初始化的时候，会一并记录App版本，手机型号等信息，网络切换的时候还会记录网络类型|
 |日志格式为CSV格式，方便后端解析展示|写日志的时候，会同时写入当前时间，线程ID，线程的名字，Log等级，以及当前所在类和方法的名字|
@@ -64,6 +65,27 @@ sdcard/Android/data/
  VLog.init(VLogConfig(this, BuildConfig.DEBUG, true))
 ```
 
+### 常用配置说明
+
+```java
+VLogConfig config = new VLogConfig(this)
+        .setLogPath(customLogPath)          // 自定义日志目录
+        .setLogEncrypt(logEncrypt)          // 自定义加密
+        .setEnableLogInspector(true);       // 开启应用内日志查看
+
+config.setSaveLog(true);                    // 默认 true，是否默认写入文件
+config.setShowLog(true);                    // 默认 true，是否默认输出到控制台
+config.setShowDetailedLog(true);            // 默认 true，是否输出详细日志
+config.setBeautifyLog(true);                // 默认 true，是否美化控制台日志
+```
+
+说明：
+
+- `setSaveLog(false)` 只会关闭默认日志调用的写盘行为
+- 如果显式调用 `logSave()`，或者底层接口手动传入 `save=true`，仍然会写入文件
+- 当前版本的新日志默认直接写入当日日志文件
+- 旧版本遗留的 `cache.log` 会在初始化时自动迁移，无需额外配置缓存目录
+
 ## 开启通知栏日志入口
 添加通知栏权限
 ```
@@ -94,9 +116,17 @@ java
 LogExtKt.log("hello VLog");
 ```
 
+### `saveLog` 行为说明
+
+- 默认情况下，`VLogConfig` 的 `saveLog` 为 `true`
+- 如果不传 `save` 参数，`logI()`、`logD()`、`logE()` 等快捷方法会沿用当前配置里的 `saveLog`
+- 如果调用 `config.setSaveLog(false)`，默认快捷日志将不再写入文件
+- `logSave()` 会强制保存到文件，不受 `setSaveLog(false)` 影响
+
 ## 立即写入到文件，在上传日志的时候调用
 
 ```
 VLog.flush();
 ```
 
+`VLog.flush()` 会等待当前日志队列中的待写任务执行完成后，再执行刷盘，适合在上传日志、关键流程结束、应用即将退出等场景调用。

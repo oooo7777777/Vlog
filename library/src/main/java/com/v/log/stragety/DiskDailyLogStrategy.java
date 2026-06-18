@@ -12,6 +12,8 @@ import com.v.log.util.LogExtKt;
 import com.v.log.util.LogUtils;
 import com.v.log.util.NetworkManager;
 
+import java.util.concurrent.Future;
+
 public class DiskDailyLogStrategy implements DiskLogStrategy {
 
     private static final String NEW_LINE = System.getProperty("line.separator");
@@ -26,7 +28,7 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
     }
 
     private void initNativeLogger() {
-        LightLog.newInstance().init(ConfigCenter.getInstance().getCachePath(),
+        LightLog.newInstance().init(
                 ConfigCenter.getInstance().getLogPath(),
                 ConfigCenter.getInstance().getMaxLogSizeMb(),
                 ConfigCenter.getInstance().getMaxKeepDaily());
@@ -76,7 +78,17 @@ public class DiskDailyLogStrategy implements DiskLogStrategy {
 
     @Override
     public void flush() {
-        LightLog.newInstance().flush();
+        try {
+            Future<?> barrier = ALogThreadPool.submit(new Runnable() {
+                @Override
+                public void run() {
+                    LightLog.newInstance().flush();
+                }
+            });
+            barrier.get();
+        } catch (Exception e) {
+            LightLog.newInstance().flush();
+        }
     }
 
 

@@ -14,8 +14,6 @@ import com.v.log.util.NetworkManager;
 
 import java.util.List;
 
-import me.weishu.reflection.Reflection;
-
 public final class VLog {
 
     private static Logger sLogger = new ALogger();
@@ -31,29 +29,23 @@ public final class VLog {
         }
         ConfigCenter configCenter = ConfigCenter.getInstance();
         final Context applicationContext = logConfig.getContext().getApplicationContext();
-        if (sDiskLogPrinter == null) {
-            configCenter.setContext(applicationContext);
-            sDiskLogPrinter = new DiskLogPrinter(logConfig.getContext(), logConfig.getLogEncrypt());
-            sLogger.addPrinter(sDiskLogPrinter);
-            NetworkManager.getInstance().registerNetworChangeListener(applicationContext);
-        }
+        configCenter.setContext(applicationContext);
         configCenter.setMaxKeepDaily(logConfig.getMaxKeepDaily());
         configCenter.setMaxLogSizeMb(logConfig.getMaxLogSizeMb());
         configCenter.setLogPath(logConfig.getLogPath());
-        configCenter.setCachePath(logConfig.getCachePath());
         configCenter.setSaveLog(logConfig.getSaveLog());
         configCenter.setShowLog(logConfig.getShowLog());
         configCenter.setShowDetailedLog(logConfig.getShowDetailedLog());
         configCenter.setBeautifyLog(logConfig.getBeautifyLog());
+
+        if (sDiskLogPrinter == null) {
+            sDiskLogPrinter = new DiskLogPrinter(logConfig.getContext(), logConfig.getLogEncrypt());
+            sLogger.addPrinter(sDiskLogPrinter);
+            NetworkManager.getInstance().registerNetworChangeListener(applicationContext);
+        }
         LogInspectorStore.INSTANCE.setEnabled(Boolean.TRUE.equals(logConfig.getEnableLogInspector()));
         LogInspectorStore.INSTANCE.setPreviewLength(logConfig.getLogInspectorPreviewLength());
         LogInspectorNotifier.INSTANCE.setup(applicationContext, Boolean.TRUE.equals(logConfig.getEnableLogInspector()));
-
-        try {
-            Reflection.unseal(logConfig.getContext());
-        } catch (Exception e) {
-
-        }
     }
 
 

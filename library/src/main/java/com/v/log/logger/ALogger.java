@@ -99,7 +99,7 @@ public class ALogger implements Logger {
 
     @Override
     public void clearLogPrinters() {
-
+        logPrinters.clear();
     }
 
     private synchronized void log(int priority, Throwable throwable, String tag, Boolean save, Boolean show, Boolean beautify, Boolean detailed, String message) {

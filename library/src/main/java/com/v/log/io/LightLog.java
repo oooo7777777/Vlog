@@ -6,31 +6,29 @@ import com.v.log.util.DateUtil;
 import com.v.log.util.FileUtils;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.lang.reflect.Method;
-import java.nio.BufferOverflowException;
-import java.nio.MappedByteBuffer;
-import java.nio.ReadOnlyBufferException;
 import java.nio.channels.FileChannel;
+import java.nio.channels.WritableByteChannel;
 
 public class LightLog {
     private static final long KB = 1024;
     private static final long MB = 1024 * KB;
-    private static final long DEFAULT_CACHE_SIZE = 1 * KB;
     private static final int MAX_WRITE_CHUNK_SIZE = 64 * 1024;
+    private static final long FORCE_INTERVAL_MS = 250;
+    private static final long FORCE_THRESHOLD_BYTES = 16 * KB;
     private static final int MINUTE = 60 * 1000;
     private static final long DAY = 24 * 60 * 60 * 1000;
     private static final double DEFAULT_MAX_LOG_SIZE = 50;
     private static final int DEFAULT_KEEP_DAILY = 7;
 
     private static volatile LightLog sLightLog;
-    private MappedByteBuffer mappedByteBuffer;
-    private long mappedBufferSize = DEFAULT_CACHE_SIZE;
+    private RandomAccessFile mLogWriter;
+    private FileChannel mLogChannel;
+    private long mPendingForceBytes;
+    private long mLastForceTime;
+    private String mActiveLogDate;
 
-
-    private String mCachePath; //log缓存目录
     private String mPath;      //log目录
     private double mMaxLogSizeMb = DEFAULT_MAX_LOG_SIZE;
     private int mMaxKeepDaily = DEFAULT_KEEP_DAILY;
@@ -52,103 +50,47 @@ public class LightLog {
         return sLightLog;
     }
 
-    public void init(String cachePath, String path, double maxLogSizeMb, int maxKeepDaily) {
-        mCachePath = cachePath;
+    public void init(String path, double maxLogSizeMb, int maxKeepDaily) {
         mPath = path;
         mMaxLogSizeMb = maxLogSizeMb;
         mMaxKeepDaily = maxKeepDaily;
-        mappedBufferSize = DEFAULT_CACHE_SIZE;
-        mappedByteBuffer = null;
-        if (TextUtils.isEmpty(mCachePath) || TextUtils.isEmpty(mPath)) {
+        mPendingForceBytes = 0;
+        mLastForceTime = 0;
+        mActiveLogDate = null;
+        closeLogWriter();
+        if (TextUtils.isEmpty(mPath)) {
             throw new RuntimeException("init method is not invoked");
+        }
+        try {
+            migrateLegacyCacheIfNeeded(DateUtil.getDateStr(System.currentTimeMillis()));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    public void flush() {
+    public synchronized void flush() {
         String currentDate = DateUtil.getDateStr(System.currentTimeMillis());
         flush(currentDate);
     }
 
-    public void flush(String date) {
+    public synchronized void flush(String date) {
         if (TextUtils.isEmpty(date)) {
             return;
         }
-        String cachePath = getCachePath();
-        String logPath = mPath + File.separator + date + ".log";
-        File cacheFile = new File(cachePath);
-        if (!cacheFile.exists()) {
-            return;
-        }
-
-        RandomAccessFile rafi = null;
-        RandomAccessFile rafo = null;
-        FileChannel fci = null;
-        FileChannel fco = null;
-
         try {
-            File logFile = new File(logPath);
-            if (!logFile.exists()) {
-                logFile.getParentFile().mkdirs();
-                logFile.createNewFile();
+            if (date.equals(mActiveLogDate)) {
+                forceCurrentLogWrites(true);
+            } else {
+                closeLogWriter();
+                migrateLegacyCacheIfNeeded(date);
             }
-
-            rafi = new RandomAccessFile(cacheFile, "rw");
-            rafo = new RandomAccessFile(logFile, "rw");
-
-            fci = rafi.getChannel();
-            fco = rafo.getChannel();
-
-            long cacheSize = fci.size();
-            long logSize = fco.size();
-
-            MappedByteBuffer mbbi = fci.map(FileChannel.MapMode.READ_WRITE, 0, cacheSize);
-            MappedByteBuffer mbbo = fco.map(FileChannel.MapMode.READ_WRITE, logSize, cacheSize);
-            for (int i = 0; i < cacheSize; i++) {
-                mbbo.put(mbbi.get(i));
-            }
-            //解除内存映射
-            unmap(mbbi);
-            unmap(mbbo);
-            //清空缓存文件
-            FileWriter fileWriter = new FileWriter(cacheFile);
-            fileWriter.write("");
-            fileWriter.flush();
-            fileWriter.close();
-            unmap(mappedByteBuffer);
-            mappedByteBuffer = null;
-            mappedBufferSize = DEFAULT_CACHE_SIZE;
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (null != fci) {
-                    fci.close();
-                    fci = null;
-                }
-
-                if (null != fco) {
-                    fco.close();
-                    fco = null;
-                }
-
-                if (null != rafi) {
-                    rafi.close();
-                    rafi = null;
-                }
-
-                if (null != rafo) {
-                    rafo.close();
-                    rafo = null;
-                }
-            } catch (Exception e2) {
-                e2.printStackTrace();
-            }
         }
-
     }
 
 
-    public void write(byte[] log) {
+    public synchronized void write(byte[] log) {
 
         if (!isDay()) {
             long tempCurrentDay = DateUtil.getCurrentTime();
@@ -173,33 +115,11 @@ public class LightLog {
         }
 
         try {
-            int offset = 0;
-            while (offset < log.length) {
-                int remaining = log.length - offset;
-                MappedByteBuffer mbbi = getMappedByteBuffer(Math.min(remaining, MAX_WRITE_CHUNK_SIZE));
-                if (mbbi == null) {
-                    return;
-                }
-                int writable = Math.min(mbbi.remaining(), remaining);
-                if (writable <= 0) {
-                    String currentDate = DateUtil.getDateStr(System.currentTimeMillis());
-                    flush(currentDate);
-                    continue;
-                }
-                mbbi.put(log, offset, writable);
-                offset += writable;
-                if (offset < log.length && !mbbi.hasRemaining()) {
-                    String currentDate = DateUtil.getDateStr(System.currentTimeMillis());
-                    flush(currentDate);
-                }
-            }
-        } catch (BufferOverflowException e) {
-            //缓存区满了则flush到日志文件
             String currentDate = DateUtil.getDateStr(System.currentTimeMillis());
-            flush(currentDate);
-
-            write(log);
-        } catch (ReadOnlyBufferException e) {
+            ensureLogWriter(currentDate);
+            appendToCurrentLog(log);
+            forceCurrentLogWrites(false);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -253,67 +173,129 @@ public class LightLog {
         }
     }
 
-    private String getCachePath() {
-        if (TextUtils.isEmpty(mCachePath)) {
-            throw new RuntimeException("init method is not invoked");
+    private void ensureLogWriter(String date) throws IOException {
+        if (date.equals(mActiveLogDate) && mLogWriter != null && mLogChannel != null && mLogChannel.isOpen()) {
+            return;
         }
-        return mCachePath + File.separator + "cache.log";
+        forceCurrentLogWrites(true);
+        closeLogWriter();
+        File logFile = new File(mPath, date + ".log");
+        File parent = logFile.getParentFile();
+        if (parent != null && !parent.exists()) {
+            parent.mkdirs();
+        }
+        if (!logFile.exists()) {
+            logFile.createNewFile();
+        }
+        mLogWriter = new RandomAccessFile(logFile, "rw");
+        mLogChannel = mLogWriter.getChannel();
+        mLogChannel.position(mLogChannel.size());
+        mActiveLogDate = date;
+        mLastForceTime = System.currentTimeMillis();
     }
 
-    private MappedByteBuffer getMappedByteBuffer(int requiredSize) {
-        long desiredSize = Math.max(DEFAULT_CACHE_SIZE, Math.min(MAX_WRITE_CHUNK_SIZE, requiredSize));
-        if (null != mappedByteBuffer) {
-            if (mappedBufferSize >= desiredSize && mappedByteBuffer.remaining() > 0) {
-                return mappedByteBuffer;
-            }
-            unmap(mappedByteBuffer);
-            mappedByteBuffer = null;
-            mappedBufferSize = DEFAULT_CACHE_SIZE;
+    private void appendToCurrentLog(byte[] log) throws IOException {
+        if (mLogChannel == null || !mLogChannel.isOpen()) {
+            return;
         }
-        RandomAccessFile rafi;
-        FileChannel fci;
+        int offset = 0;
+        while (offset < log.length) {
+            int writable = Math.min(MAX_WRITE_CHUNK_SIZE, log.length - offset);
+            int written = 0;
+            while (written < writable) {
+                written += mLogChannel.write(java.nio.ByteBuffer.wrap(log, offset + written, writable - written));
+            }
+            offset += written;
+            mPendingForceBytes += written;
+        }
+    }
+
+    private void forceCurrentLogWrites(boolean forceAll) throws IOException {
+        if (mLogChannel == null || !mLogChannel.isOpen()) {
+            return;
+        }
+        long now = System.currentTimeMillis();
+        if (!forceAll
+                && mPendingForceBytes < FORCE_THRESHOLD_BYTES
+                && now - mLastForceTime < FORCE_INTERVAL_MS) {
+            return;
+        }
+        mLogChannel.force(false);
+        mPendingForceBytes = 0;
+        mLastForceTime = now;
+    }
+
+    private void closeLogWriter() {
         try {
-            File cacheFile = new File(getCachePath());
-            if (!cacheFile.exists()) {
-                cacheFile.getParentFile().mkdirs();
-                cacheFile.createNewFile();
-            }
-
-            rafi = new RandomAccessFile(cacheFile, "rw");
-            fci = rafi.getChannel();
-
-            //如果缓存大小大于零，先flush下,因为可能缓存文件里有上次启动app写入的数据，所以先要flush一下
-            if (fci.size() > 0) {
-                String currentDate = DateUtil.getDateStr(System.currentTimeMillis());
-                flush(currentDate);
-            }
-
-            MappedByteBuffer mbbi = fci.map(FileChannel.MapMode.READ_WRITE, 0, desiredSize);
-            if (null != mbbi) {
-                mappedByteBuffer = mbbi;
-                mappedBufferSize = desiredSize;
-                return mbbi;
+            if (mLogChannel != null) {
+                mLogChannel.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        return null;
-    }
-
-    /**
-     * 解除内存与文件的映射
-     */
-    private void unmap(MappedByteBuffer mbbi) {
-        if (mbbi == null) {
-            return;
+        } finally {
+            mLogChannel = null;
         }
         try {
-            Class<?> clazz = Class.forName("sun.nio.ch.FileChannelImpl");
-            Method m = clazz.getDeclaredMethod("unmap", MappedByteBuffer.class);
-            m.setAccessible(true);
-            m.invoke(null, mbbi);
-        } catch (Throwable e) {
+            if (mLogWriter != null) {
+                mLogWriter.close();
+            }
+        } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            mLogWriter = null;
+            mActiveLogDate = null;
+        }
+    }
+
+    private void migrateLegacyCacheIfNeeded(String date) throws IOException {
+        File cacheFile = getLegacyCacheFile();
+        if (!cacheFile.exists() || cacheFile.length() <= 0) {
+            return;
+        }
+        ensureLogWriter(date);
+        RandomAccessFile cacheReader = null;
+        FileChannel cacheChannel = null;
+        try {
+            cacheReader = new RandomAccessFile(cacheFile, "rw");
+            cacheChannel = cacheReader.getChannel();
+            long cacheSize = cacheChannel.size();
+            transferFully(cacheChannel, mLogChannel, cacheSize);
+            cacheChannel.truncate(0);
+            cacheChannel.force(true);
+            mPendingForceBytes += cacheSize;
+            forceCurrentLogWrites(true);
+        } finally {
+            if (cacheChannel != null) {
+                cacheChannel.close();
+            }
+            if (cacheReader != null) {
+                cacheReader.close();
+            }
+        }
+    }
+
+    private File getLegacyCacheFile() {
+        if (TextUtils.isEmpty(mPath)) {
+            throw new RuntimeException("init method is not invoked");
+        }
+        File baseDir = new File(mPath).getParentFile();
+        if (baseDir == null) {
+            return new File("cache.log");
+        }
+        return new File(new File(baseDir, "cache"), "cache.log");
+    }
+
+    private void transferFully(FileChannel input, WritableByteChannel output, long bytes) throws IOException {
+        long position = 0;
+        while (position < bytes) {
+            long transferred = input.transferTo(position, bytes - position, output);
+            if (transferred <= 0) {
+                break;
+            }
+            position += transferred;
+        }
+        if (position < bytes) {
+            throw new IOException("Failed to transfer complete cache file. expected=" + bytes + ", actual=" + position);
         }
     }
 }

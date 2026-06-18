@@ -36,11 +36,6 @@ public class ConfigCenter {
      */
     private String logPath;
 
-    /**
-     * 日志缓存路径
-     */
-    private String cachePath;
-
     private Context context;
 
 
@@ -141,19 +136,8 @@ public class ConfigCenter {
         return logPath;
     }
 
-    public String getCachePath() {
-        if (TextUtils.isEmpty(cachePath)) {
-            cachePath = getDefaultCachePath();
-        }
-        return cachePath;
-    }
-
     public void setLogPath(String mLogPath) {
         this.logPath = mLogPath;
-    }
-
-    public void setCachePath(String mCachePath) {
-        this.cachePath = mCachePath;
     }
 
     public Context getContext() {
@@ -176,15 +160,6 @@ public class ConfigCenter {
      */
     private String getDefaultLogPath() {
         String mPath = new File(getContext().getExternalFilesDir(null), "log").getAbsolutePath();
-        File logFile = new File(mPath);
-        if (!logFile.exists()) {
-            logFile.mkdirs();
-        }
-        return mPath;
-    }
-
-    private String getDefaultCachePath() {
-        String mPath = new File(getContext().getExternalFilesDir(null), "cache").getAbsolutePath();
         File logFile = new File(mPath);
         if (!logFile.exists()) {
             logFile.mkdirs();
